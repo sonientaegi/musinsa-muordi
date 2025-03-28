@@ -12,7 +12,7 @@ import java.util.List;
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
     /**
      * 모든 결과를 반환한다.
-     * @return 모든 카테고리 레코드의 DTO를 display_sequence 오름차순으로 정렬하여 반환하거나, 미발견시 빈 배열을 반환한다.
+     * @return 모든 카테고리 레코드의 DTO를 display_sequence 오름차순으로 정렬하여 반환하거나, 미발견시 빈 리스트를 반환한다.
      */
     @Query(value = """
         select new com.musinsa.muordi.platform.domain.category.CategoryDTO(category.id, category.name, category.display_sequence)
@@ -36,7 +36,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     /**
      * 카테고리 명칭으로 카테고리를 조회한다.
      * @param name 카테고리 명칭
-     * @return 발견한 모든 카테고리 레코드의 DTO를 display_sequence 오름차순으로 정렬하여 반환하거나, 미발견시 빈 배열을 반환한다.
+     * @return 발견한 모든 카테고리 레코드의 DTO를 display_sequence 오름차순으로 정렬하여 반환하거나, 미발견시 빈 리스트를 반환한다.
      */
     @Query(value = """
         select new com.musinsa.muordi.platform.domain.category.CategoryDTO(category.id, category.name, category.display_sequence)

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,11 +40,17 @@ class CategoryRepositoryTest {
     void tearDown() {
     }
 
+    // 전시순서 정합성 제약조건 확인. 이미 존재하는 display_sequence 값을 입력하는 경우 unique key 조건을 위배하여 무결성오류예외를 반환한다.
+    @Test
+    @Transactional
+    void createCategoryExistedDisplaySequence() {
+        assertThrows(DataIntegrityViolationException.class, () -> this.repository.save(new Category(null, "CATEGORY 999", 1)));
+    }
+
     // 전시순서 정렬 확인.
     @Test
     @Transactional
     void allWithSorted() {
-        
         List<CategoryDTO> dtos = repository.all();
         assertNotNull(dtos);
         assertNotEquals(0, dtos.size());
@@ -52,7 +59,7 @@ class CategoryRepositoryTest {
         }
     }
     
-    // 빈 카테고리 조회시 빈 배열 반환 확인.
+    // 빈 카테고리 조회시 빈 리스트 반환 확인.
     @Test
     @Transactional
     void allWithEmptied() {
