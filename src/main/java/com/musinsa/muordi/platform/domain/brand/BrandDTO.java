@@ -23,4 +23,9 @@ public class BrandDTO {
     @Setter(AccessLevel.PACKAGE)
     private Integer id;
     private String name;
+
+    @Override
+    protected Object clone() {
+        return new BrandDTO(this.id, this.name);
+    }
 }
