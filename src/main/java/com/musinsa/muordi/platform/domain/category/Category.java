@@ -1,6 +1,5 @@
 package com.musinsa.muordi.platform.domain.category;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
