@@ -1,5 +1,6 @@
 package com.musinsa.muordi.platform.domain.brand;
 
+import com.musinsa.muordi.platform.domain.brand.Brand;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,14 +8,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
-import java.lang.reflect.Executable;
 import java.util.*;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class BrandRepositoryTest {
+public class BrandRepositoryTest {
+    /**
+     * DTO 테스트를 지원하기위해 제공하는 샘플 데이터 입니다.
+     * @return
+     */
+    public static Brand sample() {
+        return new Brand(1, "BRAND");
+    }
+
     @Autowired
     BrandRepository repository;
 

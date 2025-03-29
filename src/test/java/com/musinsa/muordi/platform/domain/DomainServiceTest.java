@@ -2,10 +2,8 @@ package com.musinsa.muordi.platform.domain;
 
 import com.musinsa.muordi.platform.domain.brand.Brand;
 import com.musinsa.muordi.platform.domain.brand.BrandRepository;
-import com.musinsa.muordi.platform.domain.category.Category;
 import com.musinsa.muordi.platform.domain.category.CategoryRepository;
 import jakarta.transaction.Transactional;
-import org.assertj.core.util.BigIntegerComparator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -55,11 +53,11 @@ class DomainServiceTest {
     @Transactional
     @DisplayName("domain.category : 카테고리 조회")
     void testGetCategories() {
-        List<Category> actuals = this.service.getCategories();
+        List<CategoryDto> actuals = this.service.getCategories();
         assertNotNull(actuals);
         assertTrue(actuals.size() > 0);
 
-        List<Category> expecteds = this.categoryRepository.findAll();
+        List<CategoryDto> expecteds = CategoryDto.fromEntities(this.categoryRepository.findAll());
         assertTrue(actuals.containsAll(expecteds));
         assertTrue(expecteds.containsAll(actuals));
     }
@@ -69,8 +67,8 @@ class DomainServiceTest {
     @Transactional
     @DisplayName("domain.brand : 브랜드 전체 조회")
     void testGetBrands() {
-        List<Brand> expecteds = this.testBrands;
-        List<Brand> actuals = this.service.getBrands();
+        List<BrandDto> expecteds = BrandDto.fromEntities(this.testBrands);
+        List<BrandDto> actuals = this.service.getBrands();
         assertNotNull(actuals);
         assertTrue(actuals.containsAll(expecteds));
         assertTrue(expecteds.containsAll(actuals));
@@ -81,7 +79,7 @@ class DomainServiceTest {
     @DisplayName("domain.brand : 브랜드 명칭 조회")
     void testGetBrandsByName() {
         String expected = this.testBrands.get(3).getName();
-        List<Brand> actuals = this.service.getBrands(expected);
+        List<BrandDto> actuals = this.service.getBrands(expected);
         assertNotNull(actuals);
         assertTrue(actuals.size() > 0);
         actuals.forEach(actual -> assertEquals(expected, actual.getName()));
@@ -91,7 +89,7 @@ class DomainServiceTest {
     @Transactional
     @DisplayName("domain.brand : 브랜드 이름 조회 - 없는 경우")
     void testGetBrandsByNameNotExist() {
-        List<Brand> actuals = this.service.getBrands("BRAND NEVER EXISTS!");
+        List<BrandDto> actuals = this.service.getBrands("BRAND NEVER EXISTS!");
         assertNotNull(actuals);
         assertTrue(actuals.size() == 0);
     }
@@ -100,8 +98,8 @@ class DomainServiceTest {
     @Transactional
     @DisplayName("domain.brand : 브랜드 아이디 조회")
     void testGetBrandById() {
-        Brand expected = this.testBrands.get(2);
-        Brand actual = this.service.getBrand(expected.getId()).orElse(null);
+        BrandDto expected = BrandDto.fromEntity(this.testBrands.get(2));
+        BrandDto actual = this.service.getBrand(expected.getId()).orElse(null);
         assertNotNull(actual);
         assertEquals(expected, actual);
     }
@@ -110,8 +108,29 @@ class DomainServiceTest {
     @Transactional
     @DisplayName("domain.brand : 브랜드 아이디 조회 - 없는 경우")
     void testGetBrandByIdNotExist() {
-        Optional<Brand> actual = this.service.getBrand(Integer.MAX_VALUE);
+        Optional<BrandDto> actual = this.service.getBrand(Integer.MAX_VALUE);
         assertNotNull(actual);
         assertTrue(actual.isEmpty());
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("domain.brand : 신규브랜드 생성")
+    void newBrand() {
+        BrandDto expected = BrandDto.builder().name("BRAND NEW").build();
+        BrandDto actual = this.service.newBrand(expected);
+        assertNotNull(actual);
+        assertEquals(expected.getName(), actual.getName());
+    }
+
+    @Test
+    @Transactional
+    void updateBrand() {
+        BrandDto expected = BrandDto.builder().name("BRAND UPDATED").build();
+        Brand target = this.testBrands.get(0);
+        BrandDto actual = this.service.updateBrand(target.getId(), expected).orElse(null);
+        assertNotNull(actual);
+        assertEquals(target.getId(), actual.getId());
+        assertEquals(expected.getName(), actual.getName());
     }
 }

@@ -14,7 +14,15 @@ import java.util.stream.IntStream;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class CategoryRepositoryTest {
+public class CategoryRepositoryTest {
+    /**
+     * DTO 테스트를 지원하기위해 제공하는 샘플 데이터 입니다.
+     * @return
+     */
+    public static Category sample() {
+        return new Category(1, "SAMPLE", 1);
+    }
+
     @Autowired
     CategoryRepository repository;
 
