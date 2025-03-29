@@ -8,10 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,12 +18,12 @@ class CategoryRepositoryTest {
     @Autowired
     CategoryRepository repository;
 
-    private Map<Integer, Category> targets = new HashMap<>();
+    private List<Category> testCases = new ArrayList<>();
 
     @BeforeEach
     void setUp() {
         // 테스트 케이스 생성.
-        this.repository.saveAll(
+        this.testCases = this.repository.saveAll(
             List.of(
                 new Category(null, "CATEGORY 3", 5),
                 new Category(null, "CATEGORY 1", 1),
@@ -33,88 +31,85 @@ class CategoryRepositoryTest {
                 new Category(null, "CATEGORY 3", 2),
                 new Category(null, "CATEGORY 4", 4)
             )
-        ).forEach(category -> this.targets.put(category.getId(), category));
+        );
     }
 
     @AfterEach
     void tearDown() {
     }
 
-    // 전시순서 정합성 제약조건 확인. 이미 존재하는 display_sequence 값을 입력하는 경우 unique key 조건을 위배하여 무결성오류예외를 반환한다.
+    // 전체 카테고리 조회 시 전시순서 정렬 확인.
     @Test
     @Transactional
-    void createCategoryExistedDisplaySequence() {
-        assertThrows(DataIntegrityViolationException.class, () -> this.repository.save(new Category(null, "CATEGORY 999", 1)));
+    void all() {
+        List<Category> categories = repository.findAll();
+        assertNotNull(categories);
+        assertEquals(this.testCases.size(), categories.size());
+        IntStream.range(1, categories.size()).forEach(i -> {
+            assertTrue(categories.get(i-1).getDisplaySequence() < categories.get(i).getDisplaySequence());
+        });
     }
 
-    // 전시순서 정렬 확인.
-    @Test
-    @Transactional
-    void allWithSorted() {
-        List<CategoryDTO> dtos = repository.all();
-        assertNotNull(dtos);
-        assertNotEquals(0, dtos.size());
-        for(int i = 1; i < dtos.size(); i++) {
-            assertTrue(dtos.get(i-1).getDisplaySequence() < dtos.get(i).getDisplaySequence());
-        }
-    }
-    
     // 빈 카테고리 조회시 빈 리스트 반환 확인.
     @Test
     @Transactional
     void allWithEmptied() {
         this.repository.deleteAll();
-        List<CategoryDTO> targets = repository.all();
-        assertNotNull(targets);
-        assertEquals(targets.size(), 0);
+        List<Category> actual = this.repository.findAll();
+        assertNotNull(actual);
+        assertEquals(actual.size(), 0);
     }
 
-    // 식별자별 조회 결과 확인.
+    // 카테고리 식별자별 조회 결과 확인.
     @Test
     @Transactional
     void byId() {
-        this.targets.forEach((id, target) -> {
-            CategoryDTO source = this.repository.byId(id);
-            assertTrue(source.getId().equals(target.getId()) && source.getName().equals(target.getName()) && source.getDisplaySequence() == target.getDisplay_sequence());
+        this.testCases.forEach(expected -> {
+            assertEquals(expected, this.repository.findById(expected.getId()).orElse(null));
         });
-    }
+    };
 
     // 존재하지않는 식별자 조회 결과 null 확인.
     @Test
     @Transactional
     void byIdNotExists() {
-        assertNull(this.repository.byId(999));
+        assertNull(this.repository.findById(Integer.MAX_VALUE).orElse(null));
     }
 
-    // 이름별 조회 결과 및 정렬 확인.
+    // 이름 조회 결과와 정렬 확인.
     @Test
     @Transactional
     void byName() {
-        // 이름별 조회 결과 확인.
-        Map<String, List<Category>> targetsByName = new HashMap<>();
-        targets.forEach((id, target) -> {
-            targetsByName.computeIfAbsent(target.getName(), k -> new ArrayList<>()).add(target);
+        // 테스트케이스를 이름순으로 분류 후 결과를 전시 오름차순 정렬.
+        Map<String, List<Category>> expected = new HashMap<>();
+        this.testCases.forEach(category -> {
+            expected.computeIfAbsent(category.getName(), name -> new ArrayList<>()).add(category);
         });
+        expected.values().stream().forEach(
+                categories -> categories.sort(Comparator.comparingInt(Category::getDisplaySequence))
+        );
 
-        targetsByName.forEach((name, target) -> {
-            List<CategoryDTO> sources = this.repository.byName(name);
-
-            // 이름 확인.
-            sources.forEach(source -> assertEquals(source.getName(), name));
-
-            // 전시순서 정렬 확인.
-            for(int i = 1; i < sources.size(); i++) {
-                assertTrue(sources.get(i-1).getDisplaySequence() < sources.get(i).getDisplaySequence());
-            }
+        // 이름별 조회 결과와 기댓값을 비교.
+        this.testCases.stream().map(Category::getName).forEach(name -> {
+            assertEquals(expected.get(name), this.repository.findByNameOrderByDisplaySequenceAsc(name));
         });
     }
 
-    // 존재하지않는 이름 조회 결과 null 확인.
+    // 존재하지않는 카테고리 조회 결과 null 또는 빈 리스트 확인.
     @Test
     @Transactional
     void byNameNotExists() {
-        List<CategoryDTO> targets = this.repository.byName("CATEGORY 999");
-        assertNotNull(targets);
-        assertEquals(0, targets.size());
+        assertThrows(NoSuchElementException.class, () -> this.repository.findById(Integer.MAX_VALUE).get());
+        assertEquals(0, this.repository.findByName("CATEGORY" + Integer.MAX_VALUE).size());
     }
+
+
+    // 전시순서 정합성 제약조건 확인.
+    // 이미 존재하는 display_sequence 값을 입력하는 경우 unique key 조건을 위배하여 무결성오류예외를 반환한다.
+    @Test
+    @Transactional
+    void createCategoryExistedDisplaySequence() {
+        assertThrows(DataIntegrityViolationException.class, () -> this.repository.save(new Category(null, "CATEGORY" + Integer.MAX_VALUE, 1)));
+    }
+
 }
