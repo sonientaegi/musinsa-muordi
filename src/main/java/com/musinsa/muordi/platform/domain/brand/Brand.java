@@ -35,6 +35,16 @@ public class Brand implements Serializable {
 
     private String name;
 
+    /**
+     * 신규 브랜드 생성에 사용하는 생성자. 브랜드의 이름을 지정한 객체를 생성한 다음
+     * {@link BrandRepository#save(Object)} 또는 {@link BrandRepository#saveAll(Iterable)}를 호출하여 새로운 브랜드 레코드를 생성한다.
+     * @param name 브랜드 명칭
+     */
+    @Builder
+    public Brand(String name) {
+        this.name = name;
+    }
+
     @Override
     protected Object clone() {
         return new Brand(this.getId(), this.getName());
