@@ -1,15 +1,15 @@
 package com.musinsa.muordi.platform.domain.brand;
 
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
+import java.lang.reflect.Executable;
 import java.util.*;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,171 +18,168 @@ class BrandRepositoryTest {
     @Autowired
     BrandRepository repository;
 
-    private Map<Integer, BrandDTO> targets = new HashMap<>();
+    private Map<Integer, Brand> testCases = new HashMap<>();
 
     @BeforeEach
     void setUp() {
         // 테스트 케이스 생성.
         this.repository.saveAll(
             List.of(
-                new BrandDTO(null, "BRAND 3"),
-                new BrandDTO(null, "BRAND 4"),
-                new BrandDTO(null, "BRAND 2"),
-                new BrandDTO(null, "BRAND 1"),
-                new BrandDTO(null, "BRAND 4")
+                new Brand(null, "BRAND 3"),
+                new Brand(null, "BRAND 4"),
+                new Brand(null, "BRAND 2"),
+                new Brand(null, "BRAND 1"),
+                new Brand(null, "BRAND 4")
             )
-        ).forEach(brand -> this.targets.put(brand.getId(), brand));
+        ).forEach(brand -> this.testCases.put(brand.getId(), brand));
     }
 
 //    @AfterEach
 //    void tearDown() {
 //    }
 
-    // 모든 브랜드 조회
+    // 모든 브랜드 조회.
     @Test
     @Transactional
-    void allWithSorted() {
-        List<BrandDTO> sources = repository.all();
-        assertNotNull(sources);
-        assertEquals(this.targets.size(), sources.size());
-        sources.forEach(source -> {
-            BrandDTO target = targets.get(source.getId());
-            assertNotNull(target);
-            assertEquals(target, source);
-        });
-    }
-    
-    // 빈 브랜드 조회시 빈 배열 반환 확인.
-    @Test
-    @Transactional
-    void allWithEmptied() {
-        this.repository.deleteAll();
-        List<BrandDTO> targets = repository.all();
-        assertNotNull(targets);
-        assertEquals(0, targets.size());
-    }
-
-    // 식별자별 조회 결과 확인.
-    @Test
-    @Transactional
-    void byId() {
-        this.targets.forEach((id, target) -> {
-            BrandDTO source = this.repository.byId(id);
-            assertEquals(target, source);
+    void all() {
+        List<Brand> actuals = repository.findAll();
+        assertNotNull(actuals);
+        assertEquals(this.testCases.size(), actuals.size());
+        actuals.forEach(actual -> {
+            Brand expected = this.testCases.get(actual.getId());
+            assertEquals(expected, actual);
         });
     }
 
-    // 존재하지않는 식별자 조회 결과 null 확인.
+    // 식별자 조회.
     @Test
     @Transactional
-    void byIdNotExists() {
-        assertNull(this.repository.byId(999));
-    }
-
-    // 이름별 조회 결과 확인.
-    @Test
-    @Transactional
-    void byName() {
-        // 이름별 조회 결과 확인.
-        Map<String, List<BrandDTO>> targetsByName = new HashMap<>();
-        targets.forEach((id, target) -> {
-            targetsByName.computeIfAbsent(target.getName(), k -> new ArrayList<>()).add(target);
-        });
-
-        targetsByName.forEach((name, target) -> {
-            List<BrandDTO> sources = this.repository.byName(name);
-
-            // 이름 확인.
-            sources.forEach(source -> assertEquals(name, source.getName()));
+    void  findById() {
+        this.testCases.values().forEach(testCase -> {
+            assertEquals(testCase, this.repository.findById(testCase.getId()).orElse(null));
         });
     }
 
-    // 존재하지않는 이름 조회 결과 null 확인.
+    // 명칭 조회.
     @Test
     @Transactional
-    void byNameNotExists() {
-        List<BrandDTO> sources = this.repository.byName("BRAND 999");
-        assertNotNull(sources);
-        assertEquals(0, sources.size());
+    void findByName() {
+        this.testCases.values().stream().map(Brand::getName).forEach(name -> {
+            List<Brand> actuals = this.repository.findByName(name);
+            assertNotNull(actuals);
+            actuals.forEach(actual -> {
+                Brand expected = this.testCases.get(actual.getId());
+                assertEquals(expected, actual);
+            });
+        });
+    }
+
+    // 존재하지 않는 브랜드 식별자 조회.
+    //
+    @Test
+    @Transactional
+    void findByIdNotExists() {
+        assertThrows(NoSuchElementException.class, () -> {this.repository.findById(Integer.MIN_VALUE).get();});
+    }
+
+    // 존재하지 않는 브랜드 명칭 조회ㅣ.
+    @Test
+    @Transactional
+    void findByNameNotExists() {
+        assertEquals(0, this.repository.findByName("BRAND" + Integer.MAX_VALUE).size());
     }
 
     // 단건 저장
     @Test
     @Transactional
     void save() {
-        BrandDTO target = new BrandDTO(null, "TEMPORARY BRAND");
-        BrandDTO source = this.repository.save(target);
-        assertNotNull(source);
-        assertNotNull(source.getId());
-        assertEquals(target.getName(), source.getName());
+        Brand target = new Brand(null, "BRAND" + Integer.MAX_VALUE);
+        Brand actual = this.repository.save(target);
+        assertNotNull(actual);
+        assertNotNull(actual.getId());
+        assertTrue(target.getName().equals(actual.getName()));
     }
 
     // 단건 갱신
     @Test
     @Transactional
     void update() {
-        BrandDTO target = this.targets.get(this.targets.keySet().iterator().next());
-        target.setName("UPDATED BRAND");
-        assertEquals(target, this.repository.save(target));
-        assertEquals(target, this.repository.byId(target.getId()));
+        Brand testCase = this.testCases.values().iterator().next();
+        Brand expected = (Brand) testCase.clone();
+        expected.setName("BRAND" + Integer.MAX_VALUE);
+        Brand actual = this.repository.save(expected);
+        assertNotNull(actual);
+        assertEquals(expected, actual);
     }
 
     // 다건 저장
     @Test
     @Transactional
     void saveAll() {
-        BrandDTO source = new BrandDTO(null, "TEMPORARY BRAND");
-        BrandDTO target = this.repository.save(source);
-        assertNotNull(target);
-        assertNotNull(target.getId());
-        assertEquals(target.getName(), source.getName());
+        List<Brand> expecteds = this.testCases.values().stream().map(tc -> {
+            Brand expect = new Brand(null, "NEW " + tc.getName());
+            return expect;
+        }).toList();
+
+        List<Brand> actuals = this.repository.saveAll(expecteds);
+        assertNotNull(actuals);
+        assertEquals(expecteds.size(), actuals.size());
+        for(int i = 0; i < expecteds.size(); i++) {
+            Brand actual = actuals.get(i);
+            Brand expected = expecteds.get(i);
+            assertTrue(actual.getName().equals(expected.getName()));
+        }
     }
 
     // 존재하지 않는 키 저장
     // 예외 발생 : ObjectOptimisticLockingFailureException
     @Test
-    @Transactional
+    @Transactional // <- 일부러 rollback을 일으킬거임.
     void saveNotExists() {
-        BrandDTO source = this.targets.get(this.targets.keySet().iterator().next());
-        source.setId(999);
-        assertThrows(ObjectOptimisticLockingFailureException.class, ()->this.repository.save(source));
+        Brand expected = new Brand(Integer.MAX_VALUE, "MAL BRAND");
+        assertThrows(ObjectOptimisticLockingFailureException.class, ()->this.repository.save(expected));
     }
 
     // 다건 저장 & 갱신
     @Test
     @Transactional
     void saveAndUpdate() {
-        List<BrandDTO> modifiedTargets = this.targets.values().stream().map(target -> (BrandDTO)target.clone()).toList();
-        modifiedTargets.get(0).setId(null);                 // 생성
-        modifiedTargets.get(1).setName("UPDATED BRAND 1");  // 수정
-        // modifiedTargets.get(2).setId(null);              // --
-        modifiedTargets.get(3).setId(null);                 // 생성
-        modifiedTargets.get(4).setName("UPDATED BRAND 2");  // 수정
+        Function<Brand,Brand> copyForTest = (src) -> {
+            Brand dst = (Brand)src.clone();
+            dst.setName("MODIFIED " + src.getName());
+            return dst;
+        };
 
-//        Random rand = new Random();
-//        modifiedTargets.forEach(target -> {
-//            switch(rand.nextInt(3)) {
-//                case 0:
-//                    target.setId(null);
-//                    break;
-//                case 1:
-//                    target.setName("UPDATED BRAND" + rand.nextInt());
-//                    break;
-//                case 2:
-//                    // Do nothing!
-//                    break;
-//            }
-//        });
+        // 생성 & 수정 케이스 생성
+        Iterator<Brand> iterator = this.testCases.values().iterator();
+        List<Brand> expecteds = List.of(new Brand[]{
+                new Brand(null, "NEW BRAND 1"), // 생성
+                copyForTest.apply(iterator.next()), // 수정
+                new Brand(null, "NEW BRAND 2"), // 생성
+                copyForTest.apply(iterator.next()), // 수정
+                new Brand(null, "NEW BRAND 3"), // 생성
+                copyForTest.apply(iterator.next()), // 수정
+        });
 
-        List<BrandDTO> sources = this.repository.saveAll(modifiedTargets);
-        for (int i=0; i < sources.size(); i++) {
-            BrandDTO target = modifiedTargets.get(i);
-            BrandDTO source = sources.get(i);
-            if (target.getId() == null) {
-                assertEquals(target.getName(), source.getName());
+        // 검증. 신규 생성의 경우 식별자를 새로 채번한것을 제외하고, 나머지 모든 값은 같아야 한다.
+        List<Brand> actuals = this.repository.saveAll(expecteds);
+        assertNotNull(actuals);
+        assertEquals(expecteds.size(), actuals.size());
+        for (int i=0; i < actuals.size(); i++) {
+            Brand expected = expecteds.get(i);
+            Brand actual = actuals.get(i);
+
+            // 식별자 확인.
+            if (expected.getId() != null) {
+                // 수정 시
+                assertEquals(expected.getId(), actual.getId());
             } else {
-                assertEquals(target, source);
+                // 생성 시
+                assertNotNull(actual.getId());
             }
+
+            // 값 확인
+            assertTrue(expected.getName().equals(actual.getName()));
         }
     }
 
@@ -190,16 +187,17 @@ class BrandRepositoryTest {
     @Test
     @Transactional
     void delete() {
-        BrandDTO source = this.targets.get(this.targets.keySet().iterator().next());
-        this.repository.deleteById(source.getId());
-        assertNull(this.repository.byId(source.getId()));
+        Brand tc = this.testCases.values().iterator().next();
+        this.repository.deleteById(tc.getId());
+        assertNull(this.repository.findById(tc.getId()).orElse(null));
     }
 
     // 존재하지 않는 레코드 삭제
     @Test
     @Transactional
     void deleteNotExists() {
-        this.repository.deleteById(999);
-        assertNull(this.repository.byId(999));
+        int fakeId = Integer.MAX_VALUE;
+        assertNull(this.repository.findById(fakeId).orElse(null));
+        assertDoesNotThrow(() -> this.repository.deleteById(fakeId));
     }
 }

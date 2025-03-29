@@ -4,15 +4,17 @@ package com.musinsa.muordi.platform.domain.brand;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
+
 /**
- * BRAND entity를 정의한다.
+ * 브랜드 entity를 정의한다.
  * <ul>
- *     <li>Integer id (PK)</li>
- *     <li>String  name </li>
+ *     <li>Integer {@link Brand#id}(PK) 브랜드 식별자.</li>
+ *     <li>String  {@link Brand#name} 브랜드 명칭</li>
  * </ul>
  * 인덱스 정보
  * <ul>
- *     <li>name</li>
+ *     <li>{@link Brand#name}</li>
  * </ul>
  */
 @Getter
@@ -25,11 +27,16 @@ import lombok.*;
 @Table(name = "brand", indexes = {
         @Index(name = "brand_idx_name", columnList = "name"),
 })
-public class Brand {
+public class Brand implements Serializable {
     @Id
     @Setter(AccessLevel.PRIVATE)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private String name;
+
+    @Override
+    protected Object clone() {
+        return new Brand(this.getId(), this.getName());
+    }
 }
