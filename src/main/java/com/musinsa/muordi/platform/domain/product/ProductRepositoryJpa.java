@@ -25,6 +25,12 @@ interface ProductRepositoryJpa extends JpaRepository<Product, Long>, AtomicUpdat
      */
     List<Product> findProductByBrand_Name(String brandName);
 
+    /**
+     * 브랜드 식별자로 상품을 조회한다.
+     * @param id 조회할 상품의 브랜드 식별자.
+     * @return 발견한 브랜드 리스트, 또는 빈 리스트.
+     */
+    List<Product> findProductByBrand_Id(int id);
     //    /**
 //     * 명칭으로 브랜드를 조회한다.
 //     * @param brand 조회할 브랜드 명칭

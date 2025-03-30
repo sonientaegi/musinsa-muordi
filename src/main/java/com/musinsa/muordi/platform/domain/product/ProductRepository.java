@@ -47,6 +47,15 @@ public class ProductRepository {
         return this.repository.findProductByBrand_Name(name);
     }
 
+    /**
+     * 브랜드 식별자로 상품을 조회한다.
+     * @param id 브랜드 식별자.
+     * @return 발견 시 상품 리스트를, 그 외에는 빈 리스트를 반환한다.
+     */
+    public List<Product> findByBrandId(int id) {
+        return this.repository.findProductByBrand_Id(id);
+    }
+
     // TODO 상품의 브랜드FK 없을 시 오류 처리
     /**
      * 상품을 생성한다. 상품생성시 브랜드 식별자는 필수이며, 브랜드가 존재하지 않는 경우
