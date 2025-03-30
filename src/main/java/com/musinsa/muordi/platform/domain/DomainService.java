@@ -3,13 +3,17 @@ package com.musinsa.muordi.platform.domain;
 import com.musinsa.muordi.platform.domain.brand.Brand;
 import com.musinsa.muordi.platform.domain.brand.BrandRepository;
 import com.musinsa.muordi.platform.domain.category.CategoryRepository;
+import com.musinsa.muordi.platform.domain.product.Product;
+import com.musinsa.muordi.platform.domain.product.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -17,6 +21,7 @@ import java.util.Optional;
 public class DomainService {
     private final CategoryRepository categoryRepository;
     private final BrandRepository brandRepository;
+    private final ProductRepository productRepository;
 
     /**
      * 카테고리 목록을 조회한다. 조회결과는 항상 전시순서 오름차순으로 정렬되어있다.
@@ -101,5 +106,71 @@ public class DomainService {
      */
     public void deleteBrand(int id) {
         this.brandRepository.deleteById(id);
+    }
+
+    /**
+     * 상품을 조회한다.
+     * @param id 상품 식별자.
+     * @return 해당 상품을 감싼, 그 외에는 비어있는 Optional을 반환한다.
+     */
+    public Optional<ProductDto> getProduct(long id) {
+        return this.productRepository.findById(id).flatMap(entity -> Optional.of(ProductDto.fromEntity(entity)));
+    }
+
+    /**
+     * 상품 목록을 조회한다.
+     * @return 상품 리스트
+     */
+    public List<ProductDto> getProducts() {
+        return ProductDto.fromEntities(this.productRepository.findAll());
+    }
+
+    /**
+     * 브랜드 이름으로 상품목록을 조회한다. 같은 이름의 브랜드가 여러개 있으면 모두 반환한다.
+     * @param brandName 브랜드 이름.
+     * @return 상품 리스트
+     */
+    public List<ProductDto> getProductsByBrandName(String brandName) {
+        return ProductDto.fromEntities(this.productRepository.findByBrandName(brandName));
+    }
+
+    /**
+     * 브랜드 식별자로 상품 목록을 조회한다.
+     * @param brandId 브랜드 식별자.
+     * @return 상품 리스트
+     */
+    public List<ProductDto> getProductsByBrandId(int brandId) {
+        return ProductDto.fromEntities(this.productRepository.findByBrandId(brandId));
+    }
+
+    // TODO 예외처리 어떻게 할지.
+    /**
+     * 새로운 상품을 생성한다.
+     * @param productDto 새로 생성할 상품 DTO.
+     * @param brandId 상품의 브랜드 식별자.
+     * @return 새로 생성한 상품 DTO.
+     */
+    public ProductDto newProduct(@NonNull ProductDto productDto, int brandId) {
+        Product src = productDto.toEntity();
+        return ProductDto.fromEntity(productRepository.save(src, brandId));
+    }
+
+    // TODO 예외처리 어떻게 할지.
+    /**
+     * 상품을 수정한다. 만약 수정하려는 상품이 없다면...
+     * @param id 수정하려는 상품 식별자.
+     * @param productDto 수정하려는 상품 정보.
+     * @return 성공 시 수정한 상품을 감싼, 그 외에는 비어있는 Optional을 반환한다.
+     */
+    public Optional<ProductDto> updateProduct(long id, @NonNull ProductDto productDto) {
+        return this.productRepository.updateById(id, productDto.toEntity()).flatMap(entity -> Optional.of(ProductDto.fromEntity(entity)));
+    }
+
+    /**
+     * 상품을 삭제한다.
+     * @param id 삭제할 상품의 식별자.
+     */
+    public void deleteProduct(long id) {
+        this.productRepository.deleteById(id);
     }
 }

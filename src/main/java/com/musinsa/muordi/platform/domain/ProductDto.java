@@ -4,7 +4,6 @@ import com.musinsa.muordi.platform.domain.product.Product;
 import lombok.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 상품 DTO는 다음의 정보를 제공한다.
@@ -14,7 +13,7 @@ import java.util.stream.Collectors;
  *     <li>brandName : 브랜드 이름</li>
  *     <li>price : 가격</li>
  * </ul>
- * 상품식별자와 브랜드 정보는 읽기 전용이며, 판매가 필드는 수정이 가능하다. 신규 상품 생성시에는 브랜드 식별자와 가격정보를 입력한 DTO를 이용한다.
+ * 상품식별자와 브랜드 정보는 읽기 전용이며, 판매가 필드는 수정이 가능하다. 신규 상품 생성시에는 가격정보를 입력한 DTO를 이용한다.
  */
 @Getter
 @Setter
@@ -36,12 +35,10 @@ public class ProductDto {
 
     /**
      * 신규 상품 등록용 객체 생성자.
-     * @param brandId 상품의 브랜드 식별자
      * @param price 판매가
      */
     @Builder
-    public ProductDto(int brandId, int price) {
-        this.brandId = brandId;
+    public ProductDto(int price) {
         this.price = price;
     }
 
