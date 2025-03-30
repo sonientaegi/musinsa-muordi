@@ -39,11 +39,11 @@ public class BrandDto {
     }
 
     /**
-     * 브랜드 Dto로 entity를 생성한다.
+     * 브랜드 DTO로 entity를 생성한다.
      * @return 브랜드 entity.
      */
     public Brand toEntity() {
-        return Brand.builder().name(this.name).build();
+        return Brand.builder().name(this.getName()).build();
     }
 
     /**
@@ -60,12 +60,12 @@ public class BrandDto {
     }
 
     /**
-     * 브랜드 entity 리스트를 받아 DTO 리스트로 순서를 유지하여 변환한다. 브랜드 DTO와 리스트는 읽기 전용이다.
+     * 브랜드 entity 리스트를 받아 DTO 리스트로 순서를 유지하여 변환한다. 브랜드 DTO 리스트는 읽기 전용이다.
      * @param categories 브랜드 entity 리스트.
      * @return 브랜드 DTO 리스트.
      */
     public static List<BrandDto> fromEntities(List<Brand> categories) {
-        return categories.stream().map(BrandDto::fromEntity).collect(Collectors.toUnmodifiableList());
+        return categories.stream().map(BrandDto::fromEntity).toList();
     }
 
     @Override
