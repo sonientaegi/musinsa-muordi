@@ -1,8 +1,8 @@
 package com.musinsa.muordi;
 
-import com.musinsa.muordi.platform.domain.brand.BrandRepository;
-import com.musinsa.muordi.platform.domain.category.CategoryRepository;
-import com.musinsa.muordi.platform.domain.product.ProductRepository;
+import com.musinsa.muordi.platform.admin.repository.BrandRepository;
+import com.musinsa.muordi.contents.display.repository.CategoryRepository;
+import com.musinsa.muordi.platform.admin.repository.ProductRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
