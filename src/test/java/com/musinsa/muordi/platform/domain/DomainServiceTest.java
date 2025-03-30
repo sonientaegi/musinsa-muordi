@@ -1,18 +1,13 @@
 package com.musinsa.muordi.platform.domain;
 
-import com.musinsa.muordi.platform.domain.brand.Brand;
-import com.musinsa.muordi.platform.domain.brand.BrandRepository;
-import com.musinsa.muordi.platform.domain.category.CategoryRepository;
+import com.musinsa.muordi.platform.domain.product.Product;
 import jakarta.transaction.Transactional;
-import org.hibernate.annotations.DialectOverride;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -198,12 +193,15 @@ class DomainServiceTest {
     @Transactional
     @DisplayName("domain.product : 신규 상품 생성")
     void testNewProduct() {
-        int brandId = this.randBrand().getId();
-        ProductDto expected = ProductDto.builder().price(new Random().nextInt(100000)).build();
-        ProductDto actual = this.service.newProduct(expected, brandId);
+        BrandDto expectedBrand = this.randBrand();
+        ProductDto expected = ProductDto.builder()
+                .brandId(expectedBrand.getId())
+                .price(new Random().nextInt(100000))
+                .build();
+        ProductDto actual = this.service.newProduct(expected);
         assertNotNull(actual);
         assertEquals(expected.getBrandId(), actual.getBrandId());
-        assertEquals(expected.getBrandName(), actual.getBrandName());
+        assertEquals(expectedBrand.getName(), actual.getBrandName());
         assertEquals(expected.getPrice(), actual.getPrice());
     }
 
@@ -211,12 +209,21 @@ class DomainServiceTest {
     @Transactional
     @DisplayName("domain.product : 기존 상품 수정")
     void testUpdateProduct() {
-        long target = this.randProduct().getId();
-        ProductDto expected = ProductDto.builder().price(new Random().nextInt(100000)).build();
-        Optional<ProductDto> actual = this.service.updateProduct(target, expected);
+        ProductDto target = this.randProduct();
+        BrandDto expectedBrand = this.randBrand();
+        while (expectedBrand.getId() == target.getBrandId()) {
+            expectedBrand = this.randBrand();
+        }
+        ProductDto expected = ProductDto.builder()
+                .brandId(expectedBrand.getId())
+                .price(new Random().nextInt(100000))
+                .build();
+        Optional<ProductDto> actual = this.service.updateProduct(target.getId(), expected);
         assertNotNull(actual);
         assertTrue(actual.isPresent());
-        assertEquals(target, actual.get().getId());
+        assertEquals(target.getId(), actual.get().getId());
+        assertEquals(expectedBrand.getId(), actual.get().getBrandId());
+        assertEquals(expectedBrand.getName(), actual.get().getBrandName());
         assertEquals(expected.getPrice(), actual.get().getPrice());
     }
 
@@ -225,8 +232,23 @@ class DomainServiceTest {
     @DisplayName("domain.product : 기존 상품 수정 - 없는 경우")
     void testUpdateProductNotExists() {
         long target = Long.MAX_VALUE;
-        ProductDto expected = ProductDto.builder().price(new Random().nextInt(100000)).build();
+        ProductDto expected = ProductDto.builder()
+                .brandId(this.randBrand().getId())
+                .price(new Random().nextInt(100000))
+                .build();
         Optional<ProductDto> actual = this.service.updateProduct(target, expected);
+        assertNotNull(actual);
+        assertTrue(actual.isEmpty());
+    }
+
+    // TODO 브랜드 없는 경우에 대한 정의 필요
+    @Test
+    @Transactional
+    @DisplayName("domain.product : 기존 상품 수정 - 브랜드가 없는 경우")
+    void testUpdateProductWrongBrand() {
+        ProductDto target = this.randProduct();
+        target.setBrandId(Integer.MAX_VALUE);
+        Optional<ProductDto> actual = this.service.updateProduct(target.getId(), target);
         assertNotNull(actual);
         assertTrue(actual.isEmpty());
     }

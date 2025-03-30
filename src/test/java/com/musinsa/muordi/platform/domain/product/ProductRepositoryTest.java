@@ -1,6 +1,8 @@
 package com.musinsa.muordi.platform.domain.product;
 
 import com.musinsa.muordi.platform.domain.DomainService;
+import com.musinsa.muordi.platform.domain.brand.Brand;
+import com.musinsa.muordi.platform.domain.brand.BrandRepository;
 import com.musinsa.muordi.platform.domain.brand.BrandRepositoryTest;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,9 +33,8 @@ public class ProductRepositoryTest {
         return new Product(1l, BrandRepositoryTest.sample(), 50000);
     }
 
-    // 서비스 객체는 카테고리, 브랜드를 다룰 시에만 사용.
     @Autowired
-    private DomainService service;
+    private BrandRepository brandRepository;
 
     @Autowired
     private ProductRepository repository;
@@ -45,10 +46,13 @@ public class ProductRepositoryTest {
     void setUp() {
         // 각 브랜드별로 두개씩 상품을 생성해준다.
         Random rand = new Random();
-        this.service.getBrands().forEach(brandDto -> {
+        this.brandRepository.findAll().forEach(brand -> {
             IntStream.range(0, 2).forEach(i -> {
-                Product product = Product.builder().price(rand.nextInt(1000, 100000)).build();
-                Product testCase = this.repository.save(product, brandDto.getId());
+                Product product = Product.builder()
+                        .brand(brand)
+                        .price(rand.nextInt(1000, 100000))
+                        .build();
+                Product testCase = this.repository.save(product);
                 this.testCases.put(testCase.getId(), testCase);
             });
         });
@@ -60,7 +64,7 @@ public class ProductRepositoryTest {
      */
     private Product randProduct() {
         List<Product> products = this.testCases.values().stream().toList();
-        return (Product) products.get(new Random().nextInt(products.size())).clone();
+        return products.get(new Random().nextInt(products.size())).clone();
     }
 
     // 상품 전체 조회.
@@ -131,9 +135,11 @@ public class ProductRepositoryTest {
     @DisplayName("상품 생성")
     @Transactional
     void testSave() {
-        Product expected = Product.builder().price(new Random().nextInt(1000, 100000)).build();
-        this.repository.save(expected, 1);
-        Product actual = this.repository.save(expected, 1);
+        Product expected = Product.builder()
+                .brand(this.randProduct().getBrand())
+                .price(new Random().nextInt(1000, 100000))
+                .build();
+        Product actual = this.repository.save(expected);
         assertNotNull(actual);
         assertNotNull(actual.getId());
         assertNotNull(actual.getBrand());
@@ -146,7 +152,16 @@ public class ProductRepositoryTest {
     @Transactional
     void testUpdate() {
         Product testCase = this.randProduct();
-        Product expected = Product.builder().brand(testCase.getBrand()).price(new Random().nextInt(1000, 100000)).build();
+        Brand expectedBrand = this.randProduct().getBrand();
+        while (expectedBrand.getId() == testCase.getBrand().getId()) {
+            expectedBrand = this.randProduct().getBrand();
+        }
+
+        // 브랜드와 금액을 동시에 변경한다.
+        Product expected = Product.builder()
+                .brand(expectedBrand)
+                .price(new Random().nextInt(1000, 100000))
+                .build();
         Product actual = this.repository.updateById(testCase.getId(), expected).orElse(null);
         assertNotNull(actual);
         assertEquals(expected.getBrand(), actual.getBrand());
@@ -181,41 +196,5 @@ public class ProductRepositoryTest {
 
 //    @AfterEach
 //    void tearDown() {
-//    }
-
-    // 상품 브랜드 수정
-    // 어떻게 되려나.
-    @Test
-    @DisplayName("내부 확인용 - 상품의 브랜드 수정")
-    @Transactional
-    void updateBrand() {
-        // 테스트케이스 준비
-        Product target = this.randProduct();
-        Product expected = this.randProduct();
-        while(target.getBrand().getId() == expected.getBrand().getId()) {
-            expected = this.randProduct();
-        }
-        int expectedBrandId = expected.getBrand().getId();
-        Product actual = this.repository.save(target, expectedBrandId);
-
-        System.out.println(actual);
-    }
-//
-//    // 브랜드 삭제
-//    // 브랜드 삭제 시 연관 상품이 모두 삭제된다.
-//    @Test
-//    @DisplayName("내부 확인용 - 브랜드 삭제시 상품 삭제")
-//    @Transactional
-//    void deleteBrand() {
-//        List<ProductDTO> originals = this.productRepositoryImpl.findAll();
-//
-//        // 브랜드 삭제
-//        this.brandRepository.deleteById(this.brandDTOs[0].getId());
-//        List<BrandDTO> actualBrands = this.brandRepository.all();
-//
-//        List<ProductDTO> actuals = this.productRepositoryImpl.findAll();
-//
-//        // 결과 비교
-//        assertNotNull(actuals);
 //    }
 }

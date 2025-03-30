@@ -25,3 +25,36 @@ GET http://{{host}}/api/admin/v1/brand/2
 
 ### 브랜드 삭제
 DELETE http://{{host}}/api/admin/v1/brand/2
+
+### 상품 조회
+GET http://{{host}}/api/admin/v1/product
+
+### 상품 식별자 조회
+GET http://{{host}}/api/admin/v1/product/44
+
+### 브랜드 식별자로 상품 조회
+GET http://{{host}}/api/admin/v1/product/brand/5
+
+### 브랜드 이름으로 상품 조회
+GET http://{{host}}/api/admin/v1/product/brand/name/E
+
+### 상품 생성
+POST http://{{host}}/api/admin/v1/product
+Content-Type: application/json
+
+{
+    "brandId": 4,
+    "price": 4444
+}
+
+### 상품 수정
+PUT http://{{host}}/api/admin/v1/product/44
+Content-Type: application/json
+
+{
+  "brandId": 5,
+  "price": 5555
+}
+
+### 상품 삭제
+DELETE http://{{host}}/api/admin/v1/product/44

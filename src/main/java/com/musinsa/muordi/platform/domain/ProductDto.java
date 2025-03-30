@@ -25,8 +25,7 @@ public class ProductDto {
     @Setter(AccessLevel.PACKAGE)
     private Long id;
 
-    @Setter(AccessLevel.PACKAGE)
-    private Integer brandId;
+    private int brandId;
 
     @Setter(AccessLevel.PACKAGE)
     private String brandName;
@@ -35,19 +34,24 @@ public class ProductDto {
 
     /**
      * 신규 상품 등록용 객체 생성자.
+     * @param brandId 브랜드 식별자
      * @param price 판매가
      */
     @Builder
-    public ProductDto(int price) {
+    public ProductDto(int brandId, int price) {
+        this.brandId = brandId;
+        this.brandName = null;
         this.price = price;
     }
 
     /**
-     * 상품 DTO로 entity를 생성한다.
-     * @return 상품 entity
+     * 브랜드 식별자를 설정한다. entity를 참조하여 생헝한 Dto는 브랜드 이름을 가지고 있지만, 그 밖의 경우에 Dto를 생성하거나 브랜드 식별자를 수정하는경우
+     * 브랜드 명칭은 null로 바뀐다.
+     * @param brandId
      */
-    public Product toEntity() {
-        return Product.builder().price(this.getPrice()).build();
+    public void setBrandId(int brandId) {
+        this.brandId = brandId;
+        this.setBrandName(null);
     }
 
     /**

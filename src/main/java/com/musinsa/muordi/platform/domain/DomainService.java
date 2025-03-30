@@ -144,15 +144,23 @@ public class DomainService {
     }
 
     // TODO 예외처리 어떻게 할지.
+    // TODO 브랜드 없는 경우 검증 여부.
     /**
      * 새로운 상품을 생성한다.
      * @param productDto 새로 생성할 상품 DTO.
-     * @param brandId 상품의 브랜드 식별자.
      * @return 새로 생성한 상품 DTO.
      */
-    public ProductDto newProduct(@NonNull ProductDto productDto, int brandId) {
-        Product src = productDto.toEntity();
-        return ProductDto.fromEntity(productRepository.save(src, brandId));
+    public ProductDto newProduct(@NonNull ProductDto productDto) {
+        Optional<Brand> brand = this.brandRepository.findById(productDto.getBrandId());
+        if (brand.isEmpty()) {
+            // TODO 브랜드 없는 경우 어떻게 오류 처리할지 고민.
+            throw new DomainException("Brand not found");
+        }
+        Product product = Product.builder()
+                .brand(brand.get())
+                .price(productDto.getPrice())
+                .build();
+        return ProductDto.fromEntity(productRepository.save(product));
     }
 
     // TODO 예외처리 어떻게 할지.
@@ -163,7 +171,16 @@ public class DomainService {
      * @return 성공 시 수정한 상품을 감싼, 그 외에는 비어있는 Optional을 반환한다.
      */
     public Optional<ProductDto> updateProduct(long id, @NonNull ProductDto productDto) {
-        return this.productRepository.updateById(id, productDto.toEntity()).flatMap(entity -> Optional.of(ProductDto.fromEntity(entity)));
+        Optional<Brand> brand = this.brandRepository.findById(productDto.getBrandId());
+        if (brand.isEmpty()) {
+            // TODO 브랜드 없는 경우 어떻게 오류 처리할지 고민.
+           return Optional.empty();
+        }
+        Product product = Product.builder()
+                .brand(brand.get())
+                .price(productDto.getPrice())
+                .build();
+        return this.productRepository.updateById(id, product).flatMap(entity -> Optional.of(ProductDto.fromEntity(entity)));
     }
 
     /**

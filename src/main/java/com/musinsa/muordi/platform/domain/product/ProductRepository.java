@@ -19,8 +19,6 @@ public class ProductRepository {
 
     private final ProductRepositoryJpa repository;
 
-    private final BrandRepository brandRepository;
-
     /**
      * 전체 상품을 조회한다.
      * @return 모든 상품 리스트.
@@ -56,17 +54,14 @@ public class ProductRepository {
         return this.repository.findProductByBrand_Id(id);
     }
 
-    // TODO 상품의 브랜드FK 없을 시 오류 처리
+    // TODO 브랜드가 존재하지 않는 경우 어케할것인가.
     /**
      * 상품을 생성한다. 상품생성시 브랜드 식별자는 필수이며, 브랜드가 존재하지 않는 경우
      * 어떻게 오류 처리를 할지 조금 있다 고민해보자구
      * @param product 생성하려고 하는 상품의 정보.
-     * @param brandId 브랜드 id.
      * @return 신규로 생성한 상품.
      */
-    public Product save(Product product, int brandId) {
-        Brand brand = this.brandRepository.findById(brandId).orElse(null);
-        product.setBrand(brand);
+    public Product save(Product product) {
         Product actual = this.repository.save(product);
         return actual;
     }

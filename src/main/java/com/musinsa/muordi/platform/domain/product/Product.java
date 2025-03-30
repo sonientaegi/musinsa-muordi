@@ -21,8 +21,7 @@ import java.io.Serializable;
  * <ul>
  *     <li>{@link Product#brand} 브랜드 조건 검색용</li>
  * </ul>
- * PRODUCT는 상품을 판매하는 브랜드와 가격정보를 갖는다. 등록한 상품의 가격은 변경할 수 있다.
- * 등록한 상품의 브랜드는 변경이 불가하며 이 경우 상품을 새로 등록해야한다.
+ * PRODUCT는 상품을 판매하는 브랜드와 가격정보를 갖는다. 등록한 상품의 가격과 브랜드는 수정이 가능하다.
  */
 @Getter
 @Setter(AccessLevel.PACKAGE)
@@ -40,12 +39,10 @@ public class Product implements Serializable, EntityUpdate<Product> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Setter(AccessLevel.PACKAGE)
     @JsonIgnore
-    @JoinColumn(name="brand_id", nullable = false, updatable = false)
+    @JoinColumn(name="brand_id", nullable = false, updatable = true)
     @ManyToOne(fetch = FetchType.EAGER)
     private Brand brand;
-
     private int price;
 
     @Builder
@@ -56,6 +53,7 @@ public class Product implements Serializable, EntityUpdate<Product> {
 
     @Override
     public void updateFrom(Product src) {
+        this.setBrand(src.getBrand());
         this.setPrice(src.getPrice());
     }
 
