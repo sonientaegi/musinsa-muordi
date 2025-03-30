@@ -3,6 +3,7 @@ package com.musinsa.muordi.platform.domain;
 import com.musinsa.muordi.platform.domain.brand.Brand;
 import com.musinsa.muordi.platform.domain.brand.BrandRepository;
 import com.musinsa.muordi.platform.domain.category.CategoryRepository;
+import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -77,6 +78,7 @@ public class DomainService {
      * @return 성공시 수정한 브랜드를 감싼, 그 외에는 비어있는 Optional을 반환한다.
      * @throws DomainException 브랜드 수정 실패시 발생하는 예외이다.
      */
+    @Transactional
     public Optional<BrandDto> updateBrand(int id, @NonNull BrandDto brandDto) {
         Brand src = brandDto.toEntity();
         try {
@@ -93,6 +95,10 @@ public class DomainService {
         }
     }
 
+    /**
+     * 브랜드를 삭제한다.
+     * @param id 삭제할 브랜드 식별자
+     */
     public void deleteBrand(int id) {
         this.brandRepository.deleteById(id);
     }

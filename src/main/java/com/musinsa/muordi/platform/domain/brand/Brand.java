@@ -1,15 +1,21 @@
 package com.musinsa.muordi.platform.domain.brand;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.musinsa.muordi.platform.domain.product.Product;
+import com.musinsa.muordi.utils.jpa.EntityUpdate;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
 
+import java.util.List;
+
 /**
- * 브랜드 entity를 정의한다.
+ * BRAND entity를 정의한다.
  * <ul>
  *     <li>Integer {@link Brand#id}(PK) 브랜드 식별자.</li>
+ *     <li>Products {@link Brand#products}(FK) 브랜드에서 판매중인 상품{@link Product} 리스트. </li>
  *     <li>String  {@link Brand#name} 브랜드 명칭</li>
  * </ul>
  * 인덱스 정보
@@ -27,13 +33,22 @@ import java.io.Serializable;
 @Table(name = "brand", indexes = {
         @Index(name = "brand_idx_name", columnList = "name"),
 })
-public class Brand implements Serializable {
+public class Brand implements Serializable, EntityUpdate<Brand> {
     @Id
     @Setter(AccessLevel.PRIVATE)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private String name;
+
+    @ToString.Exclude
+    @OneToMany(
+            // Brand : Product = 1:N. 브랜드 삭제시 연관 상품도 모두 삭제 하도록 일관성을 지정한다.
+            mappedBy = "brand",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.REMOVE
+    )
+    private List<Product> products;
 
     /**
      * 신규 브랜드 생성에 사용하는 생성자. 브랜드의 이름을 지정한 객체를 생성한 다음
@@ -46,7 +61,16 @@ public class Brand implements Serializable {
     }
 
     @Override
+    public void updateFrom(Brand src) {
+        this.setName(src.getName());
+    }
+
+    @Override
     protected Object clone() {
-        return new Brand(this.getId(), this.getName());
+        Brand brand = new Brand(this.getId(), this.getName(), null);
+        if (this.getProducts() != null) {
+            brand.setProducts(this.getProducts().stream().map(product -> (Product) product.clone()).toList());
+        }
+        return brand;
     }
 }

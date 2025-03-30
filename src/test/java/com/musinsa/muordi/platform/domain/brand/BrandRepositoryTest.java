@@ -7,12 +7,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.*;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ActiveProfiles("test-brand")
 @SpringBootTest
 public class BrandRepositoryTest {
     /**
@@ -20,11 +22,11 @@ public class BrandRepositoryTest {
      * @return
      */
     public static Brand sample() {
-        return new Brand(1, "BRAND");
+        return new Brand(1, "BRAND", null);
     }
 
     @Autowired
-    BrandRepository repository;
+    private BrandRepository repository;
 
     private Map<Integer, Brand> testCases = new HashMap<>();
 
@@ -33,11 +35,11 @@ public class BrandRepositoryTest {
         // 테스트 케이스 생성.
         this.repository.saveAll(
             List.of(
-                new Brand(null, "BRAND 3"),
-                new Brand(null, "BRAND 4"),
-                new Brand(null, "BRAND 2"),
-                new Brand(null, "BRAND 1"),
-                new Brand(null, "BRAND 4")
+                new Brand(null, "BRAND 3", null),
+                new Brand(null, "BRAND 4", null),
+                new Brand(null, "BRAND 2", null),
+                new Brand(null, "BRAND 1", null),
+                new Brand(null, "BRAND 4", null)
             )
         ).forEach(brand -> this.testCases.put(brand.getId(), brand));
     }
@@ -101,7 +103,7 @@ public class BrandRepositoryTest {
     @Test
     @Transactional
     void save() {
-        Brand target = new Brand(null, "BRAND" + Integer.MAX_VALUE);
+        Brand target = new Brand(null, "BRAND" + Integer.MAX_VALUE,null);
         Brand actual = this.repository.save(target);
         assertNotNull(actual);
         assertNotNull(actual.getId());
@@ -125,7 +127,7 @@ public class BrandRepositoryTest {
     @Transactional
     void saveAll() {
         List<Brand> expecteds = this.testCases.values().stream().map(tc -> {
-            Brand expect = new Brand(null, "NEW " + tc.getName());
+            Brand expect = new Brand(null, "NEW " + tc.getName(), null);
             return expect;
         }).toList();
 
@@ -144,7 +146,7 @@ public class BrandRepositoryTest {
     @Test
     @Transactional // <- 일부러 rollback을 일으킬거임.
     void saveNotExists() {
-        Brand expected = new Brand(Integer.MAX_VALUE, "MAL BRAND");
+        Brand expected = new Brand(Integer.MAX_VALUE, "MAL BRAND", null);
         assertThrows(ObjectOptimisticLockingFailureException.class, ()->this.repository.save(expected));
     }
 
@@ -161,11 +163,11 @@ public class BrandRepositoryTest {
         // 생성 & 수정 케이스 생성
         Iterator<Brand> iterator = this.testCases.values().iterator();
         List<Brand> expecteds = List.of(new Brand[]{
-                new Brand(null, "NEW BRAND 1"), // 생성
+                new Brand(null, "NEW BRAND 1", null), // 생성
                 copyForTest.apply(iterator.next()), // 수정
-                new Brand(null, "NEW BRAND 2"), // 생성
+                new Brand(null, "NEW BRAND 2", null), // 생성
                 copyForTest.apply(iterator.next()), // 수정
-                new Brand(null, "NEW BRAND 3"), // 생성
+                new Brand(null, "NEW BRAND 3", null), // 생성
                 copyForTest.apply(iterator.next()), // 수정
         });
 

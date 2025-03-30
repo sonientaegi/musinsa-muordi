@@ -7,12 +7,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.*;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ActiveProfiles("test-category")
 @SpringBootTest
 public class CategoryRepositoryTest {
     /**
@@ -26,6 +29,7 @@ public class CategoryRepositoryTest {
     @Autowired
     CategoryRepository repository;
 
+    // 테스트케이스
     private List<Category> testCases = new ArrayList<>();
 
     @BeforeEach
@@ -119,5 +123,4 @@ public class CategoryRepositoryTest {
     void createCategoryExistedDisplaySequence() {
         assertThrows(DataIntegrityViolationException.class, () -> this.repository.save(new Category(null, "CATEGORY" + Integer.MAX_VALUE, 1)));
     }
-
 }

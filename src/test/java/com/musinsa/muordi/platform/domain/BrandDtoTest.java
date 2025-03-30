@@ -22,16 +22,16 @@ class BrandDtoTest {
     // Brand 리스트 -> DTO 리스트 변환 검증.
     @Test
     void fromEntities() {
-        List<Brand> categories = List.of(
+        List<Brand> brands = List.of(
                 BrandRepositoryTest.sample(),
                 BrandRepositoryTest.sample(),
                 BrandRepositoryTest.sample(),
                 BrandRepositoryTest.sample()
         );
 
-        List<BrandDto> brandDtos = BrandDto.fromEntities(categories);
-        for (int i = 0; i < categories.size(); i++) {
-            Brand brand = categories.get(i);
+        List<BrandDto> brandDtos = BrandDto.fromEntities(brands);
+        for (int i = 0; i < brands.size(); i++) {
+            Brand brand = brands.get(i);
             BrandDto brandDto = brandDtos.get(i);
 
             assertEquals(brand.getId(), brandDto.getId());

@@ -51,16 +51,11 @@ public class CategoryDto {
      * @return 카테고리 DTO 리스트.
      */
     public static List<CategoryDto> fromEntities(List<Category> categories) {
-        return categories.stream().map(CategoryDto::fromEntity).collect(Collectors.toUnmodifiableList());
+        return categories.stream().map(CategoryDto::fromEntity).toList();
     }
 
     @Override
     protected Object clone() {
-        CategoryDto dst = new CategoryDto();
-        dst.id = this.id;
-        dst.name = this.name;
-        dst.displaySequence = this.displaySequence;
-
-        return dst;
+        return new CategoryDto(this.id, this.name, this.displaySequence);
     }
 }
