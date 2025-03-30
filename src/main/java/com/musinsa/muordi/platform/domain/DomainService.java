@@ -109,6 +109,15 @@ public class DomainService {
     }
 
     /**
+     * 상품을 조회한다.
+     * @param id 상품 식별자.
+     * @return 해당 상품을 감싼, 그 외에는 비어있는 Optional을 반환한다.
+     */
+    public Optional<ProductDto> getProduct(long id) {
+        return this.productRepository.findById(id).flatMap(entity -> Optional.of(ProductDto.fromEntity(entity)));
+    }
+
+    /**
      * 상품 목록을 조회한다.
      * @return 상품 리스트
      */
@@ -153,7 +162,7 @@ public class DomainService {
      * @param productDto 수정하려는 상품 정보.
      * @return 성공 시 수정한 상품을 감싼, 그 외에는 비어있는 Optional을 반환한다.
      */
-    public Optional<ProductDto> updateProduct(int id, @NonNull ProductDto productDto) {
+    public Optional<ProductDto> updateProduct(long id, @NonNull ProductDto productDto) {
         return this.productRepository.updateById(id, productDto.toEntity()).flatMap(entity -> Optional.of(ProductDto.fromEntity(entity)));
     }
 
@@ -161,7 +170,7 @@ public class DomainService {
      * 상품을 삭제한다.
      * @param id 삭제할 상품의 식별자.
      */
-    public void deleteProduct(int id) {
+    public void deleteProduct(long id) {
         this.productRepository.deleteById(id);
     }
 }

@@ -4,6 +4,7 @@ import com.musinsa.muordi.platform.domain.brand.Brand;
 import com.musinsa.muordi.platform.domain.brand.BrandRepository;
 import com.musinsa.muordi.platform.domain.category.CategoryRepository;
 import jakarta.transaction.Transactional;
+import org.hibernate.annotations.DialectOverride;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -70,7 +71,7 @@ class DomainServiceTest {
 
     @Test
     @DisplayName("domain.brand : 브랜드 이름 조회 - 없는 경우")
-    void testGetBrandsByNameNotExist() {
+    void testGetBrandsByNameNotExists() {
         List<BrandDto> actuals = this.service.getBrands("BRAND NEVER EXISTS!");
         assertNotNull(actuals);
         assertTrue(actuals.size() == 0);
@@ -88,7 +89,7 @@ class DomainServiceTest {
 
     @Test
     @DisplayName("domain.brand : 브랜드 아이디 조회 - 없는 경우")
-    void testGetBrandByIdNotExist() {
+    void testGetBrandByIdNotExists() {
         Optional<BrandDto> actual = this.service.getBrand(Integer.MAX_VALUE);
         assertNotNull(actual);
         assertTrue(actual.isEmpty());
@@ -97,7 +98,7 @@ class DomainServiceTest {
     @Test
     @Transactional
     @DisplayName("domain.brand : 신규브랜드 생성")
-    void newBrand() {
+    void testNewBrand() {
         BrandDto expected = BrandDto.builder().name("BRAND NEW").build();
         BrandDto actual = this.service.newBrand(expected);
         assertNotNull(actual);
@@ -107,38 +108,137 @@ class DomainServiceTest {
     @Test
     @Transactional
     @DisplayName("domain.brand : 기존 브랜드 수정")
-    void updateBrand() {
+    void testUpdateBrand() {
+        int target = this.randBrand().getId();
         BrandDto expected = BrandDto.builder().name("BRAND UPDATED").build();
-        BrandDto target = this.randBrand();
-        Optional<BrandDto> actual = this.service.updateBrand(target.getId(), expected);
+        Optional<BrandDto> actual = this.service.updateBrand(target, expected);
         assertNotNull(actual);
         assertTrue(actual.isPresent());
-        assertEquals(target.getId(), actual.get().getId());
+        assertEquals(target, actual.get().getId());
         assertEquals(expected.getName(), actual.get().getName());
     }
 
     @Test
-    void getProducts() {
-
+    @Transactional
+    @DisplayName("domain.brand : 기존 브랜드 수정 - 없는 경우")
+    void testUpdateBrandNotExists() {
+        int target = Integer.MAX_VALUE;
+        BrandDto expected = BrandDto.builder().name("BRAND UPDATED").build();
+        Optional<BrandDto> actual = this.service.updateBrand(target, expected);
+        assertNotNull(actual);
+        assertTrue(actual.isEmpty());
     }
 
     @Test
-    void getProductsByBrandName() {
+    @Transactional
+    @DisplayName("domain.brand : 브랜드 삭제")
+    void testDeleteBrand() {
+        int target = this.randBrand().getId();
+        this.service.deleteBrand(target);
+        Optional<BrandDto> actual = this.service.getBrand(target);
+        assertNotNull(actual);
+        assertTrue(actual.isEmpty());
     }
 
     @Test
-    void getProductsByBrandId() {
+    @DisplayName("domain.product : 상품 단건 조회")
+    void testGetProduct() {
+        ProductDto expected = this.randProduct();
+        Optional<ProductDto> actual = this.service.getProduct(expected.getId());
+        assertNotNull(actual);
+        assertTrue(actual.isPresent());
+        assertEquals(expected, actual.get());
     }
 
     @Test
-    void newProduct() {
+    @DisplayName("domain.product : 상품 전체 조회")
+    void testGetProducts() {
+        List<ProductDto> actuals = this.service.getProducts();
+        assertNotNull(actuals);
+        assertTrue(actuals.size() > 0);
     }
 
     @Test
-    void updateProduct() {
+    @DisplayName("domain.product : 브랜드 명칭으로 상품 조회")
+    void testGetProductsByBrandName() {
+        String expected = this.randBrand().getName();
+        List<ProductDto> actuals = this.service.getProductsByBrandName(expected);
+        assertNotNull(actuals);
+        assertTrue(actuals.size() > 0);
+        actuals.forEach(actual -> assertEquals(expected, actual.getBrandName()));
     }
 
     @Test
-    void deleteProduct() {
+    @DisplayName("domain.product : 브랜드 명칭으로 상품 조회 - 없는 경우")
+    void testGetProductsByBrandNameNotExist() {
+        List<ProductDto> actuals = this.service.getProductsByBrandName("BRAND NEVER EXISTS!");
+        assertNotNull(actuals);
+        assertTrue(actuals.size() == 0);
+    }
+
+    @Test
+    @DisplayName("domain.product : 브랜드 식별자로 상품 조회")
+    void testGetProductsByBrandId() {
+        int expected = this.randBrand().getId();
+        List<ProductDto> actuals = this.service.getProductsByBrandId(expected);
+        assertNotNull(actuals);
+        assertTrue(actuals.size() > 0);
+        actuals.forEach(actual -> assertEquals(expected, actual.getBrandId()));
+    }
+
+    @Test
+    @DisplayName("domain.product : 브랜드 식별자로 상품 조회 - 없는 경우")
+    void testGetProductsByBrandIdNotExist() {
+        List<ProductDto> actuals = this.service.getProductsByBrandId(Integer.MAX_VALUE);
+        assertNotNull(actuals);
+        assertTrue(actuals.isEmpty());
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("domain.product : 신규 상품 생성")
+    void testNewProduct() {
+        int brandId = this.randBrand().getId();
+        ProductDto expected = ProductDto.builder().price(new Random().nextInt(100000)).build();
+        ProductDto actual = this.service.newProduct(expected, brandId);
+        assertNotNull(actual);
+        assertEquals(expected.getBrandId(), actual.getBrandId());
+        assertEquals(expected.getBrandName(), actual.getBrandName());
+        assertEquals(expected.getPrice(), actual.getPrice());
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("domain.product : 기존 상품 수정")
+    void testUpdateProduct() {
+        long target = this.randProduct().getId();
+        ProductDto expected = ProductDto.builder().price(new Random().nextInt(100000)).build();
+        Optional<ProductDto> actual = this.service.updateProduct(target, expected);
+        assertNotNull(actual);
+        assertTrue(actual.isPresent());
+        assertEquals(target, actual.get().getId());
+        assertEquals(expected.getPrice(), actual.get().getPrice());
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("domain.product : 기존 상품 수정 - 없는 경우")
+    void testUpdateProductNotExists() {
+        long target = Long.MAX_VALUE;
+        ProductDto expected = ProductDto.builder().price(new Random().nextInt(100000)).build();
+        Optional<ProductDto> actual = this.service.updateProduct(target, expected);
+        assertNotNull(actual);
+        assertTrue(actual.isEmpty());
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("domain.product : 상품 삭제")
+    void testDeleteProduct() {
+        long target = this.randProduct().getId();
+        this.service.deleteProduct(target);
+        Optional<ProductDto> actual = this.service.getProduct(target);
+        assertNotNull(actual);
+        assertTrue(actual.isEmpty());
     }
 }
