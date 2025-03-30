@@ -66,11 +66,9 @@ public class Brand implements Serializable, EntityUpdate<Brand> {
     }
 
     @Override
-    protected Object clone() {
-        Brand brand = new Brand(this.getId(), this.getName(), null);
-        if (this.getProducts() != null) {
-            brand.setProducts(this.getProducts().stream().map(product -> (Product) product.clone()).toList());
-        }
+    public Brand clone() {
+        // 역참조항목은 복제하지 않는다. 순환참조에 의한 무한루프 발생.
+        Brand brand = new Brand(this.getId(), this.getName(), this.getProducts());
         return brand;
     }
 }

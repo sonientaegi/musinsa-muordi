@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -34,8 +35,14 @@ class ProductDtoTest {
                 ProductRepositoryTest.sample()
         );
 
-        List<ProductDto> prodcutDtos = ProductDto.fromEntities(products);
-
-
+        List<ProductDto> productDtos = ProductDto.fromEntities(products);
+        IntStream.range(0, products.size()).forEach(i -> {
+            Product entity = products.get(i);
+            ProductDto dto = productDtos.get(i);
+            assertEquals(entity.getId(), dto.getId());
+            assertEquals(entity.getPrice(), dto.getPrice());
+            assertEquals(entity.getBrand().getId(), dto.getBrandId());
+            assertEquals(entity.getBrand().getName(), dto.getBrandName());
+        });
     }
 }

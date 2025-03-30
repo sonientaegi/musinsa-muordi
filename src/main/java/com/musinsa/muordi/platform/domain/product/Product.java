@@ -60,7 +60,7 @@ public class Product implements Serializable, EntityUpdate<Product> {
     }
 
     @Override
-    public Object clone() {
-        return new Product(this.getId(), this.getBrand(), this.getPrice());
+    public Product clone() {
+        return new Product(this.getId(), this.getBrand().clone(), this.getPrice());
     }
 }

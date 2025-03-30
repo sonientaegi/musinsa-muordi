@@ -60,7 +60,7 @@ public class ProductRepositoryTest {
      */
     private Product randProduct() {
         List<Product> products = this.testCases.values().stream().toList();
-        return products.get(new Random().nextInt(products.size()));
+        return (Product) products.get(new Random().nextInt(products.size())).clone();
     }
 
     // 상품 전체 조회.
@@ -88,7 +88,7 @@ public class ProductRepositoryTest {
 
     // 무작위로 고른 브랜드명을 가지는 모든 상품을 조회.
     @Test
-    @DisplayName("상품 브랜드 조회")
+    @DisplayName("브랜드로 상품 조회")
     @Transactional
     void testFndByBrandName() {
         String expectedName = this.randProduct().getBrand().getName();
@@ -106,8 +106,9 @@ public class ProductRepositoryTest {
         assertEquals(expecteds, actuals);
     }
 
-    // 상품 저장.
+    // 상품 생성.
     @Test
+    @DisplayName("상품 생성")
     @Transactional
     void testSave() {
         Product expected = Product.builder().price(new Random().nextInt(1000, 100000)).build();
@@ -119,8 +120,9 @@ public class ProductRepositoryTest {
         assertEquals(expected.getPrice(), actual.getPrice());
     }
 
-    // 상품 수정
+    // 상품 수정.
     @Test
+    @DisplayName("상품 수정")
     @Transactional
     void testUpdate() {
         Product testCase = this.randProduct();
@@ -133,6 +135,7 @@ public class ProductRepositoryTest {
 
     // 상품 삭제
     @Test
+    @DisplayName("상품 삭제")
     @Transactional
     void testDelete() {
         Product testCase = this.randProduct();
@@ -141,143 +144,47 @@ public class ProductRepositoryTest {
         assertNull(actual);
     }
 
-//
-////    @AfterEach
-////    void tearDown() {
-////    }
-//
-//    // 신규 상품 생성
-//    // 상품 식별자를 제외한 모든값은 그대로 유지.
-//    @Test
-//    @Transactional
-//    void save() {
-//        ProductDTO expected = new ProductDTO(null, this.brandDTOs[0].getId(), this.brandDTOs[0].getName(), 5000);
-//        ProductDTO actual = this.productRepositoryImpl.save(expected);
-//        assertNotNull(actual);
-//        assertNotNull(actual.getId());
-//        assertTrue(expected.getBrandId().equals(actual.getBrandId()) &&
-//            expected.getBrandName().equals(actual.getBrandName()) &&
-//            expected.getPrice().equals(actual.getPrice())
-//        );
+    // 존재하지 않는 상품 수정
+    // 예외 발생 : ObjectOptimisticLockingFailureException
+    @Test
+    @DisplayName("예외 발생 : 존재하지 않는 상품 수정")
+    @Transactional
+    void testUpdateNotExists() {
+        Product expected = this.randProduct();
+        expected.setPrice(Integer.MAX_VALUE);
+
+        // TODO 존재하지 않는 상품 수정 시 exception / null 어떻게 처리할지 고민.
+        // 예외 발생 : ObjectOptimisticLockingFailureException
+        Optional<Product> actual = this.repository.updateById(Integer.MIN_VALUE, expected);
+    }
+
+
+//    @AfterEach
+//    void tearDown() {
 //    }
-//
-//    // 신규 상품 다건 생성
-//    // 상품 식별자를 제외한 모든값은 그대로 유지.
-//    @Test
-//    @Transactional
-//    void saveAll() {
-//        List<ProductDTO> expecteds = List.of(
-//            new ProductDTO(null, this.brandDTOs[0].getId(), this.brandDTOs[0].getName(), 5000),
-//            new ProductDTO(null, this.brandDTOs[1].getId(), this.brandDTOs[1].getName(), 9100),
-//            new ProductDTO(null, this.brandDTOs[0].getId(), this.brandDTOs[0].getName(), 1220),
-//            new ProductDTO(null, this.brandDTOs[1].getId(), this.brandDTOs[1].getName(), 3900)
-//        );
-//        List<ProductDTO> actuals = this.productRepositoryImpl.saveAll(expecteds);
-//        assertNotNull(actuals);
-//        for (int i=0; i < expecteds.size(); i++) {
-//            ProductDTO actual = actuals.get(i);
-//            ProductDTO expected = expecteds.get(i);
-//
-//            assertNotNull(actual.getId());
-//            assertTrue(expected.getBrandId().equals(actual.getBrandId()) &&
-//                expected.getBrandName().equals(actual.getBrandName()) &&
-//                expected.getPrice().equals(actual.getPrice()));
-//        }
-//    }
-//
-//    // 상품 수정
-//    // 상품 가격만 수정이 가능하다.
-//    @Test
-//    @Transactional
-//    void update() {
-//        ProductDTO original = this.testCases.values().iterator().next();
-//        ProductDTO expected = (ProductDTO) original.clone();
-//        expected.setPrice(original.getPrice() * 2);
-//        ProductDTO actual = this.productRepositoryImpl.save(expected);
-//
-//        assertNotNull(actual);
-//        assertEquals(expected.getPrice(), actual.getPrice());
-//        assertNotEquals(original.getPrice(), actual.getPrice());
-//        assertTrue(expected.getId().equals(actual.getId()) &&
-//                expected.getBrandId().equals(actual.getBrandId()) &&
-//                expected.getBrandName().equals(actual.getBrandName()));
-//    }
-//
-//    // 상품 다건 수정
-//    // 상품 가격만 수정이 가능하다.
-//    @Test
-//    @Transactional
-//    void updateAll() {
-//        // 테스트 케이스 사본 생성 후 금액 변경
-//        List<ProductDTO> originals = this.testCases.values().stream().toList();
-//        List<ProductDTO> expecteds = new ArrayList<>();
-//        originals.forEach(originalDTO -> {
-//            ProductDTO expected = (ProductDTO) originalDTO.clone();
-//            expected.setPrice(originalDTO.getPrice() * 2);
-//            expecteds.add(expected);
-//        });
-//
-//        // 상품DB 수정 후 검증. 금액을 제외한 나머지 필드는 동일해야 함.
-//        List<ProductDTO> actuals = this.productRepositoryImpl.saveAll(expecteds);
-//        assertNotNull(actuals);
-//        assertEquals(expecteds.size(), actuals.size());
-//        for (int i=0; i < expecteds.size(); i++) {
-//            ProductDTO original = originals.get(i);
-//            ProductDTO expected = expecteds.get(i);
-//            ProductDTO actual = actuals.get(i);
-//            assertNotEquals(original.getPrice(), actual.getPrice());
-//            assertEquals(expected.getPrice(), actual.getPrice());
-//            assertTrue(expected.getBrandId().equals(actual.getBrandId()) &&
-//                    expected.getBrandName().equals(actual.getBrandName()) &&
-//                    expected.getPrice().equals(actual.getPrice()));
-//        }
-//    }
-//
-//    // 존재하지 않는 상품 수정
-//    // 예외 발생 : ObjectOptimisticLockingFailureException
-//    @Test
-//    @Transactional
-//    void updateNotExists() {
-//        ProductDTO expected = (ProductDTO) this.testCases.values().iterator().next().clone();
-//        expected.setId(Long.MAX_VALUE);
-//        expected.setPrice(expected.getPrice() * 2);
-//        assertThrows(ObjectOptimisticLockingFailureException.class, ()->this.productRepositoryImpl.save(expected));
-//    }
-//
-//    // 상품 삭제
-//    @Test
-//    @Transactional
-//    void delete() {
-//        List<BrandDTO> originalBrands = this.brandRepository.all();
-//        List<ProductDTO> originalProducts = this.productRepositoryImpl.findAll();
-//        // this.productRepository.delete(this.testCases.values().iterator().next().getId());
-//        this.brandRepository.deleteById(originalBrands.get(0).getId());
-//        List<BrandDTO> actualBrands = this.brandRepository.all();
-//        List<ProductDTO> actualProducts = this.productRepositoryImpl.findAll();
-//    }
-//
-//    // 상품 브랜드 수정
-//    // 어떻게 되려나.
-//    @Test
-//    @Transactional
-//    void updateBrand() {
-//        // 브랜드0 상품을 조회한 뒤 브랜드1로 변경하여 저장한다.
-//        BrandDTO originalBrand = this.brandDTOs[0];
-//        BrandDTO expectedBrand = this.brandDTOs[1];
-//        ProductDTO expected = this.productRepositoryImpl.findByBrand(originalBrand.getId()).get(0);
-//        expected.setBrandId(expectedBrand.getId());
-//        expected.setBrandName(expectedBrand.getName());
-//        ProductDTO actual = this.productRepositoryImpl.save(expected);
-//
-//        List<BrandDTO> actualBrands = this.brandRepository.all();
-//
-//        assertNotNull(actual);
-//        assertEquals(expected, actual);
-//    }
+
+    // 상품 브랜드 수정
+    // 어떻게 되려나.
+    @Test
+    @DisplayName("내부 확인용 - 상품의 브랜드 수정")
+    @Transactional
+    void updateBrand() {
+        // 테스트케이스 준비
+        Product target = this.randProduct();
+        Product expected = this.randProduct();
+        while(target.getBrand().getId() == expected.getBrand().getId()) {
+            expected = this.randProduct();
+        }
+        int expectedBrandId = expected.getBrand().getId();
+        Product actual = this.repository.save(target, expectedBrandId);
+
+        System.out.println(actual);
+    }
 //
 //    // 브랜드 삭제
 //    // 브랜드 삭제 시 연관 상품이 모두 삭제된다.
 //    @Test
+//    @DisplayName("내부 확인용 - 브랜드 삭제시 상품 삭제")
 //    @Transactional
 //    void deleteBrand() {
 //        List<ProductDTO> originals = this.productRepositoryImpl.findAll();
