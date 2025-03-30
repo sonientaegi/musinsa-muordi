@@ -3,13 +3,16 @@ package com.musinsa.muordi.platform.domain;
 import com.musinsa.muordi.platform.domain.brand.Brand;
 import com.musinsa.muordi.platform.domain.brand.BrandRepository;
 import com.musinsa.muordi.platform.domain.category.CategoryRepository;
+import com.musinsa.muordi.platform.domain.product.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -17,6 +20,7 @@ import java.util.Optional;
 public class DomainService {
     private final CategoryRepository categoryRepository;
     private final BrandRepository brandRepository;
+    private final ProductRepository productRepository;
 
     /**
      * 카테고리 목록을 조회한다. 조회결과는 항상 전시순서 오름차순으로 정렬되어있다.
@@ -101,5 +105,31 @@ public class DomainService {
      */
     public void deleteBrand(int id) {
         this.brandRepository.deleteById(id);
+    }
+
+    /**
+     * 상품 목록을 조회한다.
+     * @return 상품 리스트
+     */
+    public List<ProductDto> getProducts() {
+        return ProductDto.fromEntities(this.productRepository.findAll());
+    }
+
+    /**
+     * 브랜드 이름으로 상품목록을 조회한다. 같은 이름의 브랜드가 여러개 있으면 모두 반환한다.
+     * @param brandName 브랜드 이름.
+     * @return 상품 리스트
+     */
+    public List<ProductDto> getProductsByBrandName(String brandName) {
+        return ProductDto.fromEntities(this.productRepository.findByBrandName(brandName));
+    }
+
+    /**
+     * 브랜드 식별자로 상품 목록을 조회한다.
+     * @param brandId 브랜드 식별자.
+     * @return 상품 리스트
+     */
+    public List<ProductDto> getProductsByBrandId(int brandId) {
+
     }
 }
