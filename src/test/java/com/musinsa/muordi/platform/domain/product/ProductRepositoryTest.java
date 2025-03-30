@@ -88,19 +88,39 @@ public class ProductRepositoryTest {
 
     // 무작위로 고른 브랜드명을 가지는 모든 상품을 조회.
     @Test
-    @DisplayName("브랜드로 상품 조회")
+    @DisplayName("브랜드 이름으로 상품 조회")
     @Transactional
     void testFndByBrandName() {
-        String expectedName = this.randProduct().getBrand().getName();
+        String brandName = this.randProduct().getBrand().getName();
 
         // 전체 테스트케이스에서 브랜드명이 일치하는 대상을 추린다.
         List<Product> expecteds = this.testCases.values().stream()
-                .filter(p -> p.getBrand().getName().equals(expectedName))
+                .filter(p -> p.getBrand().getName().equals(brandName))
                 .sorted(Comparator.comparingLong(Product::getId))
                 .toList();
 
         // 브랜드명 조회 검증.
-        List<Product> actuals = this.repository.findByBrandName(expectedName);
+        List<Product> actuals = this.repository.findByBrandName(brandName);
+        assertNotNull(actuals);
+        actuals.sort(Comparator.comparingLong(Product::getId));
+        assertEquals(expecteds, actuals);
+    }
+
+    // 무작위로 고른 브랜드 식별자를을 가지는 모든 상품을 조회.
+    @Test
+    @DisplayName("브랜드 식별자로 상품 조회")
+    @Transactional
+    void testFndByBrandId() {
+        int brandId = this.randProduct().getBrand().getId();
+
+        // 전체 테스트케이스에서 브랜드 식별자가 일치하는 대상을 추린다.
+        List<Product> expecteds = this.testCases.values().stream()
+                .filter(p -> p.getBrand().getId().equals(brandId))
+                .sorted(Comparator.comparingLong(Product::getId))
+                .toList();
+
+        // 브랜드 식별자 조회 검증.
+        List<Product> actuals = this.repository.findByBrandId(brandId);
         assertNotNull(actuals);
         actuals.sort(Comparator.comparingLong(Product::getId));
         assertEquals(expecteds, actuals);
