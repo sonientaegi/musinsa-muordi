@@ -1,0 +1,27 @@
+### 카테고리 전체 조회
+GET http://{{host}}/api/admin/v1/category
+
+### 브랜드 생성
+POST http://{{host}}/api/admin/v1/brand
+Content-Type: application/json
+
+{
+    "name": "소년스튜디오"
+}
+
+### 브랜드 수정
+PUT http://{{host}}/api/admin/v1/brand/2
+Content-Type: application/json
+
+{
+  "name": "소니언스튜디오"
+}
+
+### 브랜드 전체 조회
+GET http://{{host}}/api/admin/v1/brand
+
+### 특정 브랜드 조회
+GET http://{{host}}/api/admin/v1/brand/2
+
+### 브랜드 삭제
+DELETE http://{{host}}/api/admin/v1/brand/2
