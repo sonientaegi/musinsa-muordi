@@ -6,8 +6,9 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@AllArgsConstructor
+@ToString
 @EqualsAndHashCode
+@AllArgsConstructor
 public class PriceRecordDto {
     protected int categoryId;
     protected int brandId;

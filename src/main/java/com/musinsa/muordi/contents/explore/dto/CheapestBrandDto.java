@@ -1,15 +1,14 @@
 package com.musinsa.muordi.contents.explore.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Setter
 @Getter
 @Builder
+@ToString
+@EqualsAndHashCode
 @AllArgsConstructor
 public class CheapestBrandDto {
     private int brandId;

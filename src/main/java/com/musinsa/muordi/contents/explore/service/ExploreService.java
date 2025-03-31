@@ -11,9 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -99,16 +97,21 @@ public class ExploreService {
 
     /**
      * 지정한 카테고리의 상품 중 상품 최댓값과 최솟값을 조회한다.
-     * @param categoryId 대상 카테고리 식별자.
+     * @param categoryName 대상 카테고리 이름..
      * @return 최댓값, 최솟값 가격정보.
      */
-    public PriceRangeOfCategoryDto PriceRangeofCategory(int categoryId) {
+    public PriceRangeOfCategoryDto PriceRangeofCategoryByName(String categoryName) {
+        // 카테고리 식별자를 구한다.
+        // TODO 카테고리 없으면부 예외 처리로 반환하자.
+        CategoryDto category = this.displayService.getCategoryByName(categoryName).orElseThrow(() -> new RuntimeException("Category not found"));
+        int categoryId = category.getId();
+
         // 최대, 최소금액 구하는 작업은 동일한 API이므로 병렬로 동시 수행할 수 있다.
         final PriceRecordWithNameDto results[] = {null, null};
         List<Thread> threads = List.of(
                 // 최댓값 구하기
                 new Thread(() -> {
-                   results[0] = this.populateNameField(this.exploreRepository.getMaxPriceOfCategory(categoryId).orElse(null));
+                    results[0] = this.populateNameField(this.exploreRepository.getMinPriceOfCategory(categoryId).orElse(null));
                 }),
                 // 최솟값 구하기
                 new Thread(() -> {
@@ -133,8 +136,8 @@ public class ExploreService {
         }
 
         return PriceRangeOfCategoryDto.builder()
-                .maxPriceRecord(results[0])
-                .minPriceRecord(results[1])
+                .minPriceRecord(results[0])
+                .maxPriceRecord(results[1])
                 .categoryId(results[0].getCategoryId())
                 .categoryName(results[0].getCategoryName())
                 .build();

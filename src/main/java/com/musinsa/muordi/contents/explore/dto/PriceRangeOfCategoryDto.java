@@ -5,6 +5,8 @@ import lombok.*;
 @Setter
 @Getter
 @Builder
+@ToString
+@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 public class PriceRangeOfCategoryDto {

@@ -56,14 +56,14 @@ class ExploreServiceTest {
     }
 
     @Test
-    void priceRangeofCategory() {
+    void priceRangeofCategoryByName() {
         PriceRangeOfCategoryDto expected = PriceRangeOfCategoryDto.builder()
                 .categoryName("상의")
                 .categoryId(1)
                 .minPriceRecord(PriceRecordWithNameDto.builder().categoryName("상의").categoryId(1).brandName("C").brandId(3).price(10000).build())
                 .maxPriceRecord(PriceRecordWithNameDto.builder().categoryName("상의").categoryId(1).brandName("I").brandId(9).price(11400).build())
                 .build();
-        PriceRangeOfCategoryDto actual = this.exploreService.PriceRangeofCategory(1);
+        PriceRangeOfCategoryDto actual = this.exploreService.PriceRangeofCategoryByName("상의");
         assertNotNull(actual);
         assertEquals(expected, actual);
 
