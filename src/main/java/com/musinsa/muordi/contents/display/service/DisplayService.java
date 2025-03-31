@@ -3,12 +3,14 @@ package com.musinsa.muordi.contents.display.service;
 import com.musinsa.muordi.contents.display.dto.CategoryDto;
 import com.musinsa.muordi.contents.display.dto.ShowcaseDto;
 import com.musinsa.muordi.contents.display.repository.*;
+import com.musinsa.muordi.platform.admin.dto.ProductDto;
 import com.musinsa.muordi.platform.admin.repository.Product;
 import com.musinsa.muordi.platform.admin.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.print.attribute.standard.MediaSize;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +31,30 @@ public class DisplayService {
      */
     public List<CategoryDto> getCategories() {
         return CategoryDto.fromEntities(this.categoryRepository.findAll());
+    }
+
+    /**
+     * 카테고리 이름을 조회한다.
+     * @param id 카테고리 식별자.
+     * @return 카테고리 DTO를 감싼, 또는 빈 Optional.
+     */
+    public Optional<CategoryDto> getCategory(int id) {
+        return this.categoryRepository.findById(id).map(CategoryDto::fromEntity);
+    }
+
+
+    /**
+     * 카테고리 명칭으로 카테고리를 조회한다. 만약 같은 이름의 카테고리가 여러개 있다면 전시순사가 가장 높은 하나를 반환한다.
+     * @param name 카테고리 이름.
+     * @return 카테고리를 감싸는, 또는 빈 Optional
+     */
+    public Optional<CategoryDto> getCategoryByName(String name) {
+        List<Category> categories = this.categoryRepository.findByName(name);
+        if (categories.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(CategoryDto.fromEntity(categories.get(0)));
+        }
     }
 
     /**
