@@ -1,0 +1,45 @@
+### 카테고리 전체 조회
+GET http://{{host}}/api/display/v1/category
+
+### 쇼케이스 전체 조회
+GET http://{{host}}/api/display/v1/showcase
+
+### 쇼케이스 상품 조회
+GET http://{{host}}/api/display/v1/showcase/4
+
+### 쇼케이스 브랜드 조회
+GET http://{{host}}/api/display/v1/showcase/brand/4
+
+### 쇼케이스 브랜드 명칭 조회
+GET http://{{host}}/api/display/v1/showcase/brand/name/D
+
+### 쇼케이스 카테고리 조회
+GET http://{{host}}/api/display/v1/showcase/category/4
+
+### 쇼케이스 카테고리 명칭 조회
+GET http://{{host}}/api/display/v1/showcase/category/name/%EC%95%84%EC%9A%B0%ED%84%B0
+
+### 쇼케이스 수정
+PUT http://{{host}}/api/display/v1/showcase/4
+Content-Type: application/json
+
+{
+  "categoryId":1
+}
+
+### 쇼케이스 삭제
+DELETE http://{{host}}/api/display/v1/showcase/4
+Content-Type: application/json
+
+### 쇼케이스 생성
+POST http://{{host}}/api/display/v1/showcase
+Content-Type: application/json
+
+{
+  "productId": 4,
+  "categoryId":8
+}
+
+
+
+

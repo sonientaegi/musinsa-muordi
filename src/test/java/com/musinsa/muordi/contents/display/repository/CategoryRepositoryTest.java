@@ -14,7 +14,7 @@ import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ActiveProfiles("test-category")
+@ActiveProfiles("test-display-category")
 @SpringBootTest
 public class CategoryRepositoryTest {
     /**

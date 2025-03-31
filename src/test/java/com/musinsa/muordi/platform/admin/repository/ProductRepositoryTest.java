@@ -13,7 +13,7 @@ import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ActiveProfiles("test-product")
+@ActiveProfiles("test-admin-product")
 @SpringBootTest
 public class ProductRepositoryTest {
     /*
