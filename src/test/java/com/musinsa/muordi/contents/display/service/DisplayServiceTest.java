@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +19,7 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@ActiveProfiles("test-display")
 class DisplayServiceTest {
     @Autowired
     private DisplayService displayService;
@@ -114,17 +116,26 @@ class DisplayServiceTest {
     }
 
     @Test
+    @Transactional
     void updateShowcase() {
         ShowcaseDto target = this.randShowcase();
-        int targetCategoryId = this.randShowcase().getCategoryId();
-        while(targetCategoryId == target.getCategoryId()) {
-            targetCategoryId = this.randShowcase().getCategoryId();
+        int expectedCategoryId = this.randShowcase().getCategoryId();
+        while(expectedCategoryId == target.getCategoryId()) {
+            expectedCategoryId = this.randShowcase().getCategoryId();
         }
 
-        Optional<ShowcaseDto> optActual = this.displayService.updateShowcase(target.getProductId(), targetCategoryId);
+        Optional<ShowcaseDto> optActual = this.displayService.updateShowcase(target.getProductId(), expectedCategoryId);
         assertTrue(optActual.isPresent());
         ShowcaseDto actual = optActual.get();
         assertEquals(target.getProductId(), actual.getProductId());
-        assertEquals(target.getCategoryId(), actual.getCategoryId());
+        assertEquals(expectedCategoryId, actual.getCategoryId());
     }
+
+    @Test
+    @Transactional
+    void deleteShowcase() {
+        ShowcaseDto target = this.randShowcase();
+        this.displayService.deleteShowcase(target.getProductId());
+    }
+
 }

@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Display 도메인 서비스.
+ */
 @RequiredArgsConstructor
 @Service
 public class DisplayService {
@@ -93,6 +96,7 @@ public class DisplayService {
      * @return 생성한 쇼케이스 DTO
      * TODO @throws 기술.
      */
+    @Transactional
     public ShowcaseDto createShowcase(long productId, int categoryId) {
         // 상품이 이미 등록되어있는지를 확인한다.
         if (this.showcaseRepository.findByProductId(productId).isPresent()) {
@@ -125,6 +129,7 @@ public class DisplayService {
      * 상품 식별자로 쇼케이스를 지운다.
      * @param productId 상품 식별자
      */
+    @Transactional
     public void deleteShowcase(long productId) {
         this.showcaseRepository.deleteByProductId(productId);
     }
