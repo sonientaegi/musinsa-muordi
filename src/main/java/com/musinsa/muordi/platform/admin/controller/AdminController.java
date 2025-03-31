@@ -1,8 +1,8 @@
 package com.musinsa.muordi.platform.admin.controller;
 
 import com.musinsa.muordi.platform.admin.dto.service.BrandDto;
-import com.musinsa.muordi.platform.admin.service.AdminService;
 import com.musinsa.muordi.platform.admin.dto.service.ProductDto;
+import com.musinsa.muordi.platform.admin.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,8 +11,8 @@ import java.util.List;
 @RequestMapping("/api/admin/v1")
 @RequiredArgsConstructor
 @RestController
-public class AdminApiController {
-    // 도메인 서비스
+public class AdminController {
+    // 어드민 서비스
     private final AdminService adminService;
 
     @PostMapping("/brand")
