@@ -32,6 +32,15 @@ public class DisplayService {
     }
 
     /**
+     * 카테고리 이름을 조회한다.
+     * @param id 카테고리 식별자.
+     * @return 카테고리 DTO를 감싼, 또는 빈 Optional.
+     */
+    public Optional<CategoryDto> getCategory(int id) {
+        return this.categoryRepository.findById(id).map(CategoryDto::fromEntity);
+    }
+
+    /**
      * 쇼케이스 전체를 조회한다.
      * @return 쇼케이스 DTO 리스트
      */
