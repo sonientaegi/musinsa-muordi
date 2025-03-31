@@ -1,13 +1,15 @@
 package com.musinsa.muordi.contents.explore.dto;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
-@EqualsAndHashCode
+@SuperBuilder
 @AllArgsConstructor
+@EqualsAndHashCode
 public class PriceRecordDto {
-    int categoryId;
-    int brandId;
-    int price;
+    protected int categoryId;
+    protected int brandId;
+    protected int price;
 }

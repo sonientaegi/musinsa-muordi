@@ -1,23 +1,16 @@
 package com.musinsa.muordi.contents.explore.repository;
 
-import com.musinsa.muordi.contents.display.repository.Category;
 import com.musinsa.muordi.contents.display.repository.CategoryRepository;
 import com.musinsa.muordi.contents.explore.dto.PriceRecordDto;
-import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 @Component
 @RequiredArgsConstructor
-public class ExploreRepositoryJpa {
+public class ExploreRepositoryJpa implements ExploreRepository {
     private final EntityManager entityManager;
     private final CategoryRepository categoryRepository;
 
@@ -50,7 +43,7 @@ ORDER BY showcase.category.displaySequence asc, product.price asc, product.brand
      * 전시 상품 중 카테고리 별 최저가격 브랜드와 상품가격을 반환한다.
      * @return 카테고리 정렬 기준으로 중복 제거를 수행한, 카테고리 별 최저 가격 브랜드 리스트.
      */
-    public List<PriceRecordDto> getCheapestOfAll() {
+    public List<PriceRecordDto> getCheapestByCategory() {
         /* H2 Native SQL
 select distinct on (CATEGORY_ID) CATEGORY_ID, BRAND_ID, PRICE from (
     select category_id as CATEGORY_ID, PRODUCT.brand_id as BRAND_ID, PRODUCT.price as PRICE
