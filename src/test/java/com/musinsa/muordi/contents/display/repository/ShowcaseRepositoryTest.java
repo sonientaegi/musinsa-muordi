@@ -1,6 +1,5 @@
 package com.musinsa.muordi.contents.display.repository;
 
-import com.musinsa.muordi.platform.admin.repository.Brand;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,24 +39,13 @@ class ShowcaseRepositoryTest {
         assertTrue(showcases.size() > 0);
     }
 
-    // 쇼케이스 상품 단건 조회
-    @Test
-    @DisplayName("쇼케이스 상품 단건 조회")
-    @Transactional
-    void testFindById() {
-        Showcase expected = this.randShowcase();
-        Optional<Showcase> actual = this.repository.findById(expected.getId());
-        assertTrue(actual.isPresent());
-        assertEquals(expected, actual.get());
-    }
-
     // 쇼케이스 상품 식별자 조회
     @Test
     @DisplayName("쇼케이스 상품 식별자 조회")
     @Transactional
     void testFindByProductId() {
         Showcase expected = this.randShowcase();
-        Optional<Showcase> actual = this.repository.findByProduct_Id(expected.getProduct().getId());
+        Optional<Showcase> actual = this.repository.findByProductId(expected.getProduct().getId());
         assertTrue(actual.isPresent());
         assertEquals(expected, actual.get());
     }
@@ -68,7 +56,7 @@ class ShowcaseRepositoryTest {
     @Transactional
     void testFindByBrandId() {
         int expected = this.randShowcase().getProduct().getBrand().getId();
-        List<Showcase> actuals = this.repository.findByProduct_Brand_Id(expected);
+        List<Showcase> actuals = this.repository.findByBrandId(expected);
 //        List<Showcase> actuals = this.repository.findAllByBrand_Id(expected);
         assertNotNull(actuals);
         assertTrue(actuals.size() > 0);
@@ -83,7 +71,7 @@ class ShowcaseRepositoryTest {
     @Transactional
     void testFindByBrandName() {
         String expected = this.randShowcase().getProduct().getBrand().getName();
-        List<Showcase> actuals = this.repository.findByProduct_Brand_Name(expected);
+        List<Showcase> actuals = this.repository.findByBrandName(expected);
         assertNotNull(actuals);
         assertTrue(actuals.size() > 0);
         actuals.forEach(actual -> {
@@ -97,7 +85,7 @@ class ShowcaseRepositoryTest {
     @Transactional
     void testFindByCategoryId() {
         int expected = this.randShowcase().getCategory().getId();
-        List<Showcase> actuals = this.repository.findByCategory_Id(expected);
+        List<Showcase> actuals = this.repository.findByCategoryId(expected);
         assertNotNull(actuals);
         assertTrue(actuals.size() > 0);
         actuals.forEach(actual -> {
@@ -111,7 +99,7 @@ class ShowcaseRepositoryTest {
     @Transactional
     void testFindByCategoryName() {
         String expected = this.randShowcase().getCategory().getName();
-        List<Showcase> actuals = this.repository.findByCategory_Name(expected);
+        List<Showcase> actuals = this.repository.findByCategoryName(expected);
         assertNotNull(actuals);
         assertTrue(actuals.size() > 0);
         actuals.forEach(actual -> {
@@ -127,7 +115,7 @@ class ShowcaseRepositoryTest {
         // 쇼케이스 생성을 위해 기존의 레코드를 하나 지운 뒤 다시 생성한다.
         Showcase target = this.randShowcase();
         int originId = target.getId();
-        this.repository.delete(target);
+        this.repository.deleteByProductId(target.getId());
 
         // 동일 트랜잭션에서 삭제 후 동일 UK를 추가하면 JPA가 정합성 오류를 반환하므로 읽기를 한번 수행한다.
         this.repository.findAll();
@@ -156,9 +144,10 @@ class ShowcaseRepositoryTest {
             expectedCategory = this.randShowcase().getCategory();
         }
         target.setCategory(expectedCategory);
-        Showcase actual = this.repository.save(target);
+        Optional<Showcase> actual = this.repository.updateByProductId(target.getProduct().getId(), target);
         assertNotNull(actual);
-        assertEquals(expectedCategory, actual.getCategory());
+        assertTrue(actual.isPresent());
+        assertEquals(expectedCategory, actual.get().getCategory());
     }
 
     // 쇼케이스 중복 생성 실패. 하나의 상품을 여러 카테고리에 등록할 수 없다.
@@ -183,14 +172,13 @@ class ShowcaseRepositoryTest {
         assertThrows(DataIntegrityViolationException.class, () -> repository.findAll());
     }
 
-    // 쇼케이스 삭제
     @Test
-    @DisplayName("쇼케이스 삭제")
+    @DisplayName("쇼케이스 삭제 - 상품 식졀자")
     @Transactional
     void testDelete() {
         Showcase expected = this.randShowcase();
-        this.repository.delete(expected);
-        Optional<Showcase> actual = this.repository.findById(expected.getId());
+        this.repository.deleteByProductId(expected.getId());
+        Optional<Showcase> actual = this.repository.findByProductId(expected.getProduct().getId());
         assertTrue(actual.isEmpty());
     }
 

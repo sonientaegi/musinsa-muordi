@@ -33,13 +33,13 @@ public class ShowcaseDto {
      */
     public static ShowcaseDto fromEntity(Showcase showcase) {
         ShowcaseDto showcaseDto = new ShowcaseDto();
-//        showcaseDto.productId = showcase.getProduct().getId();
-//        showcaseDto.price = showcase.getProduct().getPrice();
-//        showcaseDto.categoryId = showcase.getCategory().getId();
-//        showcaseDto.categoryName = showcase.getCategory().getName();
-//        showcaseDto.brandId = showcase.getProduct().getBrand().getId();
-//        showcaseDto.brandName = showcase.getProduct().getBrand().getName();
-//
+        showcaseDto.productId = showcase.getProduct().getId();
+        showcaseDto.price = showcase.getProduct().getPrice();
+        showcaseDto.categoryId = showcase.getCategory().getId();
+        showcaseDto.categoryName = showcase.getCategory().getName();
+        showcaseDto.brandId = showcase.getProduct().getBrand().getId();
+        showcaseDto.brandName = showcase.getProduct().getBrand().getName();
+
         return showcaseDto;
     }
 

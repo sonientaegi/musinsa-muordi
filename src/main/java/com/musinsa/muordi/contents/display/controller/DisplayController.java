@@ -1,6 +1,7 @@
 package com.musinsa.muordi.contents.display.controller;
 
 import com.musinsa.muordi.contents.display.dto.CategoryDto;
+import com.musinsa.muordi.contents.display.dto.ShowcaseDto;
 import com.musinsa.muordi.contents.display.service.DisplayService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,5 +20,10 @@ public class DisplayController {
     @GetMapping("/category")
     public List<CategoryDto> getCategories() {
         return this.displayService.getCategories();
+    }
+
+    @GetMapping("/showcase")
+    public List<ShowcaseDto> getShowcases() {
+        return this.displayService.getShowcases();
     }
 }
