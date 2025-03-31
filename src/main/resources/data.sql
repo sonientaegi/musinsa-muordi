@@ -169,57 +169,44 @@ insert into showcase(category_id, product_id) values
 (7,71),
 (8,72);
 
--- -- 문제 1
--- select distinct on(category_id) category_id as CATEGORY_ID, category.name as CATEGORY_NAME, brand.id as BRAND_ID, brand.name as BRAND_NAME, product.price as PRICE
--- from MUORDI_DISPLAY_V2
--- inner join PRODUCT on MUORDI_DISPLAY_V2.PRODUCT_ID = PRODUCT.ID
--- inner join CATEGORY on MUORDI_DISPLAY_V2.CATEGORY_ID = CATEGORY.ID
--- inner join BRAND on PRODUCT.BRAND_ID = BRAND.ID
--- order by category_id asc, price asc, brand_id desc;
---
--- -- 문제 2
+-- 공통
+-- select category_id as CATEGORY_ID, PRODUCT.brand_id as BRAND_ID, PRODUCT.price as PRICE
+-- from SHOWCASE
+-- inner join PRODUCT on SHOWCASE.product_id = PRODUCT.id
+-- inner join CATEGORY on SHOWCASE.category_id = CATEGORY.id
+-- order by CATEGORY.display_sequence asc, price asc, brand_id desc;
+
+-- 문제 1
+-- select distinct on (CATEGORY_ID) CATEGORY_ID, BRAND_ID, PRICE from (
+--     select category_id as CATEGORY_ID, PRODUCT.brand_id as BRAND_ID, PRODUCT.price as PRICE
+--     from SHOWCASE
+--     inner join PRODUCT on SHOWCASE.product_id = PRODUCT.id
+--     inner join CATEGORY on SHOWCASE.category_id = CATEGORY.id
+--     order by CATEGORY.display_sequence asc, price asc, brand_id desc
+-- );
+
+-- 문제 2
 -- select BRAND_ID, sum(PRICE), count(*) from (
--- select distinct on(category_id, product.brand_id) category_id as CATEGORY_ID, product.brand_id as BRAND_ID, product.price as PRICE
--- from MUORDI_DISPLAY_V2
---     inner join PRODUCT on MUORDI_DISPLAY_V2.PRODUCT_ID = PRODUCT.ID
--- order by category_id, product.brand_id asc, price asc
+--     select category_id as CATEGORY_ID, PRODUCT.brand_id as BRAND_ID, PRODUCT.price as PRICE
+--     from SHOWCASE
+--     inner join PRODUCT on SHOWCASE.product_id = PRODUCT.id
+--     inner join CATEGORY on SHOWCASE.category_id = CATEGORY.id
+--     order by CATEGORY.display_sequence asc, price asc, brand_id desc
 -- )
 -- group by BRAND_ID
 -- having count(*)=8
 -- order by sum(PRICE)
 -- limit 1;
---
--- select distinct on(category_id) category.name as CATEGORY_NAME, product.price as PRICE
--- from MUORDI_DISPLAY_V2
---      inner join PRODUCT on MUORDI_DISPLAY_V2.PRODUCT_ID = PRODUCT.ID
---      inner join CATEGORY on MUORDI_DISPLAY_V2.CATEGORY_ID = CATEGORY.ID
--- where BRAND_ID=4
--- order by PRICE asc;
---
--- -- 문제 3
--- select distinct on(product.brand_id) brand.name, product.price
--- from MUORDI_DISPLAY_V2
---     inner join PRODUCT on MUORDI_DISPLAY_V2.PRODUCT_ID = PRODUCT.ID
---     inner join BRAND on PRODUCT.BRAND_ID = BRAND.ID
--- where category_id=1
--- order by price asc
+
+-- 문제 3
+-- select CATEGORY.NAME, BRAND.name as BRAND_NAME, product.price as PRICE
+-- from SHOWCASE
+-- inner join PRODUCT on SHOWCASE.product_id = PRODUCT.id
+-- inner join CATEGORY on SHOWCASE.category_id = CATEGORY.id
+-- inner join BRAND on PRODUCT.brand_id = BRAND.id
+-- where CATEGORY.name='상의'
+-- order by PRICE desc
 -- limit 1;
---
--- select distinct on(product.brand_id) brand.name, product.price
--- from MUORDI_DISPLAY_V2
---     inner join PRODUCT on MUORDI_DISPLAY_V2.PRODUCT_ID = PRODUCT.ID
---     inner join BRAND on PRODUCT.BRAND_ID = BRAND.ID
--- where category_id=1
--- order by price desc
--- limit 1;
-
-
-
-
-
-
-
-
 
 
 
