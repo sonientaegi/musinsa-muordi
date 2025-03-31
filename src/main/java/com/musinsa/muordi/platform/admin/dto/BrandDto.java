@@ -1,4 +1,4 @@
-package com.musinsa.muordi.platform.admin.dto.service;
+package com.musinsa.muordi.platform.admin.dto;
 
 import com.musinsa.muordi.platform.admin.repository.Brand;
 import lombok.*;

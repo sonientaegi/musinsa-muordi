@@ -1,8 +1,8 @@
 package com.musinsa.muordi.platform.admin.service;
 
 import com.musinsa.muordi.common.exception.DummyException;
-import com.musinsa.muordi.platform.admin.dto.service.BrandDto;
-import com.musinsa.muordi.platform.admin.dto.service.ProductDto;
+import com.musinsa.muordi.platform.admin.dto.BrandDto;
+import com.musinsa.muordi.platform.admin.dto.ProductDto;
 import com.musinsa.muordi.platform.admin.repository.Brand;
 import com.musinsa.muordi.platform.admin.repository.BrandRepository;
 import com.musinsa.muordi.platform.admin.repository.Product;

@@ -1,6 +1,5 @@
 package com.musinsa.muordi.platform.admin.dto;
 
-import com.musinsa.muordi.platform.admin.dto.service.ProductDto;
 import com.musinsa.muordi.platform.admin.repository.Product;
 import com.musinsa.muordi.platform.admin.repository.ProductRepositoryTest;
 import org.junit.jupiter.api.DisplayName;

@@ -1,7 +1,7 @@
 package com.musinsa.muordi.platform.admin.controller;
 
-import com.musinsa.muordi.platform.admin.dto.service.BrandDto;
-import com.musinsa.muordi.platform.admin.dto.service.ProductDto;
+import com.musinsa.muordi.platform.admin.dto.BrandDto;
+import com.musinsa.muordi.platform.admin.dto.ProductDto;
 import com.musinsa.muordi.platform.admin.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

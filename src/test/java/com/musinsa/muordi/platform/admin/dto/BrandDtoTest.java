@@ -1,6 +1,5 @@
 package com.musinsa.muordi.platform.admin.dto;
 
-import com.musinsa.muordi.platform.admin.dto.service.BrandDto;
 import com.musinsa.muordi.platform.admin.repository.Brand;
 import com.musinsa.muordi.platform.admin.repository.BrandRepositoryTest;
 import org.junit.jupiter.api.Test;

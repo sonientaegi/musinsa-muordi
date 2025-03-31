@@ -1,7 +1,7 @@
 package com.musinsa.muordi.platform.admin.service;
 
-import com.musinsa.muordi.platform.admin.dto.service.BrandDto;
-import com.musinsa.muordi.platform.admin.dto.service.ProductDto;
+import com.musinsa.muordi.platform.admin.dto.BrandDto;
+import com.musinsa.muordi.platform.admin.dto.ProductDto;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
