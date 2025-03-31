@@ -15,7 +15,7 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ActiveProfiles("test")
+@ActiveProfiles("test-admin")
 @SpringBootTest
 class AdminServiceTest {
     @Autowired
@@ -129,9 +129,11 @@ class AdminServiceTest {
     @Transactional
     @DisplayName("domain.brand : 브랜드 삭제")
     void testDeleteBrand() {
-        int target = this.randBrand().getId();
-        this.service.deleteBrand(target);
-        Optional<BrandDto> actual = this.service.getBrand(target);
+//        // 삭제 테스트는 신규 생성 후 수행.
+//        BrandDto target = this.service.newBrand(BrandDto.builder().name("BRAND FOR DELETE").build());
+        BrandDto target = this.randBrand();
+        this.service.deleteBrand(target.getId());
+        Optional<BrandDto> actual = this.service.getBrand(target.getId());
         assertNotNull(actual);
         assertTrue(actual.isEmpty());
     }

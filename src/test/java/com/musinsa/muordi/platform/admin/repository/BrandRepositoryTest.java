@@ -13,7 +13,7 @@ import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ActiveProfiles("test-brand")
+@ActiveProfiles("test-admin-brand")
 @SpringBootTest
 public class BrandRepositoryTest {
     /**

@@ -1,0 +1,2 @@
+### 카테고리 전체 조회
+GET http://{{host}}/api/display/v1/category

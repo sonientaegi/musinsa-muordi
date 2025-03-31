@@ -95,7 +95,7 @@ insert into product(brand_id, price) values
     (9,2400);
 
 
-insert into muordi_display(category_id, product_id) values
+insert into showcase(category_id, product_id) values
 (1,1),
 (2,2),
 (3,3),
