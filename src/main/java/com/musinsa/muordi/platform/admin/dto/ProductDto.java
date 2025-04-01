@@ -1,9 +1,6 @@
 package com.musinsa.muordi.platform.admin.dto;
 
-import com.musinsa.muordi.platform.admin.repository.Product;
 import lombok.*;
-
-import java.util.List;
 
 /**
  * 상품 DTO는 다음의 정보를 제공한다.

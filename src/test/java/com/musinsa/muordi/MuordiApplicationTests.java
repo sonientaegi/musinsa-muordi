@@ -1,7 +1,7 @@
 package com.musinsa.muordi;
 
 import com.musinsa.muordi.platform.admin.repository.BrandRepositoryJpa2;
-import com.musinsa.muordi.contents.display.repository.CategoryRepository;
+import com.musinsa.muordi.contents.display.repository.CategoryRepositoryJpa;
 import com.musinsa.muordi.platform.admin.repository.ProductRepositoryJpaWrapper;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ class MuordiApplicationTests {
     EntityManager em;
 
     @Autowired
-    CategoryRepository categoryRepository;
+    CategoryRepositoryJpa categoryRepositoryJpa;
 
     @Autowired
     BrandRepositoryJpa2 brandRepositoryJpa2;

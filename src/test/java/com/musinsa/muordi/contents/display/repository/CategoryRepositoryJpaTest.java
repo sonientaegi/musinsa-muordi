@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test-display-category")
 @SpringBootTest
-public class CategoryRepositoryTest {
+public class CategoryRepositoryJpaTest {
     /**
      * DTO 테스트를 지원하기위해 제공하는 샘플 데이터 입니다.
      * @return
@@ -26,7 +26,7 @@ public class CategoryRepositoryTest {
     }
 
     @Autowired
-    CategoryRepository repository;
+    CategoryRepositoryJpa repository;
 
     // 테스트케이스
     private List<Category> testCases = new ArrayList<>();

@@ -8,6 +8,9 @@ import org.hibernate.PessimisticLockException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * 상품 repository 의 DML을 명세한 인터페이스이다.
+ */
 public interface ProductRepository {
     /**
      * 모든 상품을 반환한다.
@@ -16,7 +19,7 @@ public interface ProductRepository {
     List<Product> findAll();
 
     /**
-     * ID로 상품을 조회한다. ID는 상품의 유일한 식별자이며 두개이상의 같은 값은 존재하지 않는다.
+     * ID로 상품을 조회한다. ID는 상품의 유일한 식별자이며 두 개 이상의 같은 값은 존재하지 않는다.
      * @param id 상품 ID
      * @return Optional로 감싼 상품 entity, 미발견 시 빈 Optional을 반환한다. null 일 수 없다.
      */

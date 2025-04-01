@@ -3,9 +3,8 @@ package com.musinsa.muordi.contents.display.service;
 import com.musinsa.muordi.contents.display.dto.CategoryDto;
 import com.musinsa.muordi.contents.display.dto.ShowcaseDto;
 import com.musinsa.muordi.contents.display.repository.Showcase;
-import com.musinsa.muordi.contents.display.repository.ShowcaseRepository;
+import com.musinsa.muordi.contents.display.repository.ShowcaseRepositoryJpaWrapper;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +25,14 @@ class DisplayServiceTest {
 
     // 서비스 테스트 용도로만 사용.
     @Autowired
-    private ShowcaseRepository showcaseRepository;
+    private ShowcaseRepositoryJpaWrapper showcaseRepositoryJpaWrapper;
 
     /**
      * 무작위로 한개의 쇼케이스 레코드를 선택한다.
      *
      */
     private ShowcaseDto randShowcase() {
-        List<Showcase> showcases = this.showcaseRepository.findAll();
+        List<Showcase> showcases = this.showcaseRepositoryJpaWrapper.findAll();
         return ShowcaseDto.fromEntity(showcases.get(new Random().nextInt(showcases.size())));
     }
 

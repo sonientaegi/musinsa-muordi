@@ -1,6 +1,6 @@
 package com.musinsa.muordi.contents.explore.repository;
 
-import com.musinsa.muordi.contents.display.repository.ShowcaseRepository;
+import com.musinsa.muordi.contents.display.repository.ShowcaseRepositoryJpaWrapper;
 import com.musinsa.muordi.contents.explore.dto.PriceRecordDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ExploreRepositoryJpaTest {
     @Autowired
     private ExploreRepositoryJpa repository;
-    private ShowcaseRepository showcaseRepository;
+    private ShowcaseRepositoryJpaWrapper showcaseRepositoryJpaWrapper;
 
     @Test
     void getCheapestProductOfCategoryBrand() {

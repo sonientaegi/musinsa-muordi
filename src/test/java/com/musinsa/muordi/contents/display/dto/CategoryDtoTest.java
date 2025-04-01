@@ -1,7 +1,7 @@
 package com.musinsa.muordi.contents.display.dto;
 
 import com.musinsa.muordi.contents.display.repository.Category;
-import com.musinsa.muordi.contents.display.repository.CategoryRepositoryTest;
+import com.musinsa.muordi.contents.display.repository.CategoryRepositoryJpaTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -12,7 +12,7 @@ class CategoryDtoTest {
     // Category -> DTO 변환 검증.
     @Test
     void fromEntity() {
-        Category category = CategoryRepositoryTest.sample();
+        Category category = CategoryRepositoryJpaTest.sample();
 
         CategoryDto categoryDto = CategoryDto.fromEntity(category);
         assertEquals(category.getId(), categoryDto.getId());
@@ -24,10 +24,10 @@ class CategoryDtoTest {
     @Test
     void fromEntities() {
         List<Category> categories = List.of(
-                CategoryRepositoryTest.sample(),
-                CategoryRepositoryTest.sample(),
-                CategoryRepositoryTest.sample(),
-                CategoryRepositoryTest.sample()
+                CategoryRepositoryJpaTest.sample(),
+                CategoryRepositoryJpaTest.sample(),
+                CategoryRepositoryJpaTest.sample(),
+                CategoryRepositoryJpaTest.sample()
         );
 
         List<CategoryDto> categoryDtos = CategoryDto.fromEntities(categories);

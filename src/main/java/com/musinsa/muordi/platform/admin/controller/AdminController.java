@@ -80,5 +80,4 @@ public class AdminController {
     public void deleteProduct(@PathVariable int id) {
         this.adminService.deleteProduct(id);
     }
-
 }

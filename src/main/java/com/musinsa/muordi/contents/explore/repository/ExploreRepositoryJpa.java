@@ -1,6 +1,6 @@
 package com.musinsa.muordi.contents.explore.repository;
 
-import com.musinsa.muordi.contents.display.repository.CategoryRepository;
+import com.musinsa.muordi.contents.display.repository.CategoryRepositoryJpa;
 import com.musinsa.muordi.contents.explore.dto.PriceRecordDto;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ExploreRepositoryJpa implements ExploreRepository {
     private final EntityManager entityManager;
-    private final CategoryRepository categoryRepository;
+    private final CategoryRepositoryJpa categoryRepositoryJpa;
 
     /**
      * 전시 상품중 [브랜드, 카테고리] 별로 [가장 낮은 상품의 가격]을 [전시카테고리정렬순서, 금액] 오름차순으로 반환한다.
@@ -96,7 +96,7 @@ limit 1;
 
 
         // 브랜드별로 레코드 개수와 금액의 합계를 확인한다. 전시 필수조건을 만족하고, 합계금액이 최저인, 가장 먼저 발견한 브랜드를 결과로 선택한다.
-        int numOfCategories = this.categoryRepository.findAll().size();
+        int numOfCategories = this.categoryRepositoryJpa.findAll().size();
         List<int[]> sumOfPrice = new ArrayList<>();
         productsByBrand.forEach((brandId, priceRecord) -> {
             if (priceRecord.size() == numOfCategories) {

@@ -1,97 +1,80 @@
 package com.musinsa.muordi.contents.display.repository;
 
-import com.musinsa.muordi.common.jpa.AtomicUpdateById;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Service;
+import com.musinsa.muordi.common.exception.RepositoryEntityNotExistException;
+import lombok.NonNull;
+import org.hibernate.PessimisticLockException;
 
 import java.util.List;
 import java.util.Optional;
 
-@RequiredArgsConstructor
-@Service
-public class ShowcaseRepository {
-    private final ShowcaseRepositoryJpa repository;
-
+/**
+ * 쇼케이스 repository 의 DML을 명세한 인터페이스이다.
+ */
+public interface ShowcaseRepository {
     /**
      * 전체 쇼케이스를 조회한다.
-     * @return 모든 쇼케이스 리스트.
+     * @return 모든 쇼케이스 entity 리스트를 반환한다.
      */
-    public List<Showcase> findAll() {
-        return this.repository.findAll();
-    }
+    public List<Showcase> findAll();
 
     /**
-     * 상품의 식별자로 쇼케이스를 조회한다.
-     * @param productId 조회할 상품 식별자.
-     * @return 쇼케이스 리스트.
+     * 상품 ID로 쇼케이스를 조회한다.
+     * @param productId 조회할 상품 ID.
+     * @return Optional로 감싼 쇼케이스 entity, 미발견 시 빈 Optional을 반환한다. null 일 수 없다.
      */
-    public Optional<Showcase> findByProductId(long productId) {
-        return this.repository.findByProduct_Id(productId);
-    }
+    public Optional<Showcase> findByProductId(long productId);
 
     /**
-     * 상품의 브랜드 식별자로 쇼케이스를 조회한다.
-     * @param brandId 조회할 브랜드 식별자.
-     * @return 쇼케이스 리스트.
+     * 브랜드 ID로 쇼케이스를 조회한다. 해당 브랜드에 등록한 모든 상품 중 쇼케이스에 전시중인 상품 리스트를 반환한다.
+     * @param brandId 브랜드 ID
+     * @return 쇼케이스 entity 리스트를 반환한다.
      */
-    public List<Showcase> findByBrandId(int brandId) {
-        return this.repository.findByProduct_Brand_Id(brandId);
-    }
+    public List<Showcase> findByBrandId(int brandId);
 
     /**
-     * 상품의 브랜드 명칭으로 쇼케이스를 조회한다.
-     * @param brandName 조회할 브랜드 명칭.
-     * @return 쇼케이스 리스트.
+     * 브랜드 이름으로 쇼케이스를 조회한다. 해당 브랜드에 등록한 모든 상품 중 쇼케이스에 전시중인 상품 리스트를 반환한다.
+     * 같은 이름의 다른 브랜드가 있다면 모두 반환한다.
+     * @param brandName 브랜드 이름.
+     * @return 쇼케이스 entity 리스트를 반환한다.
      */
-    public List<Showcase> findByBrandName(String brandName) {
-        return this.repository.findByProduct_Brand_Name(brandName);
-    }
+    public List<Showcase> findByBrandName(String brandName);
 
     /**
-     * 상품의 카테고리 식별자로 쇼케이스를 조회한다.
-     * @param categoryId 조회할 카테고리 식별자.
-     * @return 쇼케이스 리스트.
+     * 카테고리 ID로 쇼케이스를 조회한다. 해당 카테고리로 등록한 모든 전시중인 상품을 반환한다.
+     * @param categoryId 카테고리 ID
+     * @return 쇼케이스 entity 리스트를 반환한다.
      */
-    public List<Showcase> findByCategoryId(int categoryId) {
-        return this.repository.findByCategory_Id(categoryId);
-    }
+    public List<Showcase> findByCategoryId(int categoryId);
 
     /**
-     * 상품의 카테고리 명칭으로 쇼케이스를 조회한다.
-     * @param categoryName 조회할 카테고리 명칭.
-     * @return 쇼케이스 리스트.
+     * 카테고리 이름으로 쇼케이스를 조회한다. 해당 카테고리로 등록한 모든 전시중인 상품을 반환한다.
+     * 같은 이름의 다른 카테고리가 있다면 모두 반환한다.
+     * @param categoryName 카테고리 이름.
+     * @return 쇼케이스 entity 리스트를 반환한다.
      */
-    public List<Showcase> findByCategoryName(String categoryName) {
-        return this.repository.findByCategory_Name(categoryName);
-    }
+    public List<Showcase> findByCategoryName(String categoryName);
 
     /**
-     * 상품의 쇼케이스를 삭제한다.
-     * @param productId 상품 식별자.
+     * 상품을 쇼케이스에 등록한다. 만약 상품이나 카테고리의 정보를 발견하지 못한다면 예외를 반환한다.
+     * @param showcase 등록할 쇼케이스 정보. 상품과 카테고리 값은 필수다.
+     * @return 등록한 쇼케이스 entity를 반환한다. null 일 수 없다.
      */
-    public void deleteByProductId(long productId) {
-        this.repository.deleteShowcaseByProduct_Id(productId);
-    }
+    public Showcase create(Showcase showcase);
 
     /**
-     * 쇼케이스를 저장한다.
-     * @param showcase
+     * 쇼케이스에 진열한 상품의 전시 정보를 수정한다. 만약 상품이나 카테고리의 정보를 발견하지 못한다면 예외를 반환한다.
+     * @param showcase 수정할 전시정보.
+     * @return 수정한 쇼케이스 entity를 반환한다. null 일 수 없다.
+     * @throws RepositoryEntityNotExistException 수정하려는 상품이나 카테고리 정보가 존재하지 않는다.
+     * @throws PessimisticLockException 락 획득에 실패했다.
      */
-    public Showcase save(Showcase showcase) {
-        return this.repository.save(showcase);
-    }
+    public Showcase update(@NonNull Showcase showcase);
 
     /**
-     * 상품 식별자로 쇼케이스를 찾아 수정한다.
-     * @param productId 수정할 쇼케이스의 상품식별자.
-     * @param showcase 수정할 내용.
-     * @return 수정 성공시 수정한 상품을 감싼, 그 외에는 빈 Optional을 반환한다.
-     * @see AtomicUpdateById#updateById
+     * 상품의 쇼케이스 등록 정보를 삭제한다. 실패 시 예외를 반환한다.
+     * @param productId 쇼케이스에서 제외 활 상품 ID.
+     * @return 제외 한 상품 entity. null 일 수 없다.
+     * @throws RepositoryEntityNotExistException 제외 하려는 상품이 존재하지 않는다.
      */
-    public Optional<Showcase> updateByProductId(long productId, Showcase showcase) {
-        Showcase target = this.findByProductId(productId).orElseThrow(()->new RuntimeException("Product with id " + productId + " not found"));
-        target.setCategory(showcase.getCategory());
-        return Optional.ofNullable(this.repository.updateById(target.getId(), target));
-    }
+    public Showcase delete(long productId);
 }

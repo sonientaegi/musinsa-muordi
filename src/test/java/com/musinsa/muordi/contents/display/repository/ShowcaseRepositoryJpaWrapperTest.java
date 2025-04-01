@@ -16,9 +16,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test-display-showcase")
 @SpringBootTest
-class ShowcaseRepositoryTest {
+class ShowcaseRepositoryJpaWrapperTest {
     @Autowired
-    private ShowcaseRepository repository;
+    private ShowcaseRepositoryJpaWrapper repository;
 
     /**
      * 무작위로 한개의 쇼케이스 레코드를 선택한다.
