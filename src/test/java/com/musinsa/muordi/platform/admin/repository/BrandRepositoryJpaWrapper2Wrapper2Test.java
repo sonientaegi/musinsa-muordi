@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test-admin-brand")
 @SpringBootTest
-public class BrandRepositoryTest {
+public class BrandRepositoryJpaWrapper2Wrapper2Test {
     /**
      * DTO 테스트를 지원하기위해 제공하는 샘플 데이터 입니다.
      * @return
@@ -25,7 +25,7 @@ public class BrandRepositoryTest {
     }
 
     @Autowired
-    private BrandRepository repository;
+    private BrandRepositoryJpa2 repository;
 
     private Map<Integer, Brand> testCases = new HashMap<>();
 

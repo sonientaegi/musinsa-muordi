@@ -1,8 +1,8 @@
 package com.musinsa.muordi;
 
-import com.musinsa.muordi.platform.admin.repository.BrandRepository;
+import com.musinsa.muordi.platform.admin.repository.BrandRepositoryJpa2;
 import com.musinsa.muordi.contents.display.repository.CategoryRepository;
-import com.musinsa.muordi.platform.admin.repository.ProductRepository;
+import com.musinsa.muordi.platform.admin.repository.ProductRepositoryImpl;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +17,10 @@ class MuordiApplicationTests {
     CategoryRepository categoryRepository;
 
     @Autowired
-    BrandRepository brandRepository;
+    BrandRepositoryJpa2 brandRepositoryJpa2;
 
     @Autowired
-    ProductRepository productRepository;
+    ProductRepositoryImpl productRepositoryImpl;
 
     @Test
     void contextLoads() {

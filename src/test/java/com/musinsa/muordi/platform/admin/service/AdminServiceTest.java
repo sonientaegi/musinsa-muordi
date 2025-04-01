@@ -94,9 +94,9 @@ class AdminServiceTest {
     @Test
     @Transactional
     @DisplayName("domain.brand : 신규브랜드 생성")
-    void testNewBrand() {
+    void testCreateBrand() {
         BrandDto expected = BrandDto.builder().name("BRAND NEW").build();
-        BrandDto actual = this.service.newBrand(expected);
+        BrandDto actual = this.service.createBrand(expected);
         assertNotNull(actual);
         assertEquals(expected.getName(), actual.getName());
     }

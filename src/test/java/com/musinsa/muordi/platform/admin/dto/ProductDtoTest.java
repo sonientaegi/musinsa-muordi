@@ -1,7 +1,7 @@
 package com.musinsa.muordi.platform.admin.dto;
 
 import com.musinsa.muordi.platform.admin.repository.Product;
-import com.musinsa.muordi.platform.admin.repository.ProductRepositoryTest;
+import com.musinsa.muordi.platform.admin.repository.ProductRepositoryImplTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +15,7 @@ class ProductDtoTest {
     @Test
     @DisplayName("상품 DTO -> entity 변환")
     void toEntity() {
-        Product product = ProductRepositoryTest.sample();
+        Product product = ProductRepositoryImplTest.sample();
 
         ProductDto productDto = ProductDto.fromEntity(product);
         assertEquals(product.getId(), productDto.getId());
@@ -28,10 +28,10 @@ class ProductDtoTest {
     @DisplayName("상품 entity -> DTO 변환")
     void fromEntity() {
         List<Product> products = List.of(
-                ProductRepositoryTest.sample(),
-                ProductRepositoryTest.sample(),
-                ProductRepositoryTest.sample(),
-                ProductRepositoryTest.sample()
+                ProductRepositoryImplTest.sample(),
+                ProductRepositoryImplTest.sample(),
+                ProductRepositoryImplTest.sample(),
+                ProductRepositoryImplTest.sample()
         );
 
         List<ProductDto> productDtos = ProductDto.fromEntities(products);

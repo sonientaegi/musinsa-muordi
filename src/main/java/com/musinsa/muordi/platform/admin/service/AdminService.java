@@ -1,15 +1,20 @@
 package com.musinsa.muordi.platform.admin.service;
 
+import com.musinsa.muordi.common.exception.BaseException;
 import com.musinsa.muordi.common.exception.DummyException;
+import com.musinsa.muordi.common.exception.RepositoryEntityNotExistException;
+import com.musinsa.muordi.common.exception.ResourceNotFoundException;
 import com.musinsa.muordi.platform.admin.dto.BrandDto;
+import com.musinsa.muordi.platform.admin.dto.BrandDtoMapper;
 import com.musinsa.muordi.platform.admin.dto.ProductDto;
 import com.musinsa.muordi.platform.admin.repository.Brand;
 import com.musinsa.muordi.platform.admin.repository.BrandRepository;
 import com.musinsa.muordi.platform.admin.repository.Product;
-import com.musinsa.muordi.platform.admin.repository.ProductRepository;
+import com.musinsa.muordi.platform.admin.repository.ProductRepositoryImpl;
 import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
@@ -19,84 +24,79 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class AdminService {
+    // Repository 접근
     private final BrandRepository brandRepository;
-    private final ProductRepository productRepository;
+    private final ProductRepositoryImpl productRepositoryImpl;
+
+    // entity - DTO 맵퍼
+    private final BrandDtoMapper brandMapper = BrandDtoMapper.instance;
 
     /**
-     * 브랜드 목록을 조회한다.
-     * @return 모든 브랜드 리스트 또는 빈 리스트를 반환한다.
+     * 전체 브랜드를 조회한다. 없으면 빈 리스트를 반환한다.
+     * @return 브랜드 DTO 리스트. null일 수 없다.
      */
     public List<BrandDto> getBrands() {
-        return BrandDto.fromEntities(this.brandRepository.findAll());
+        return this.brandRepository.findAll().stream().map(this.brandMapper::fromEntity).toList();
     }
 
     /**
-     * 브랜드 이름을 조회한다. 동일한 이름을 가진 브랜드가 있는 경우 모두 반환한다.
-     * @param name 브랜드 이름
-     * @return 발견한 브랜드 리스트, 또는 빈 리스트를 반환한다.
+     * 이름으로 브랜드를 조회한다. 같은 이름의 모든 브랜드를 조회하며, 하나도 없으면 빈 리스트를 반환한다.
+     * @param name 조회할 브랜드 이름.
+     * @return 브랜드 DTO 리스트. null일 수 없다.
      */
     public List<BrandDto> getBrands(String name) {
-        return BrandDto.fromEntities(this.brandRepository.findByName(name));
+        return this.brandRepository.findByName(name).stream().map(this.brandMapper::fromEntity).toList();
     }
 
     /**
-     * 브랜드 식별자를 조회한다.
-     * @param id
-     * @return 해당 식별자의 브랜드가 존재하는 경우 해당 브랜드를 감싼, 그 외에는 비어있는 Optional을 반환한다.
+     * 브랜드 ID를 조회한다. 브랜드 ID는 유일한 식별자이다.
+     * @param id 브랜드 ID.
+     * @return 브랜드 DTO. null일 수 없다.
+     * @throws ResourceNotFoundException 입력받은 ID의 브랜드가 존재하지 않는다.
      */
-    public Optional<BrandDto> getBrand(int id) {
-        return this.brandRepository.findById(id).flatMap(entity -> Optional.of(BrandDto.fromEntity(entity)));
+    public BrandDto getBrand(int id) {
+        return this.brandMapper.fromEntity(this.brandRepository.findById(id).orElseThrow(ResourceNotFoundException::new));
     }
 
     /**
-     * 새로운 브랜드를 생성한다.
-     * @param brandDto 새로 생성 할 브랜드 DTO.
+     * 새로운 브랜드를 생성한다. 만약 브랜드 생성에 실패했다면 예외를 반환한다.
+     * @param brandDto 브랜드 DTO.
      * @return 새로 생성한 브랜드 DTO.
-     * @throws DummyException 브랜드 생성 실패시 발생하는 예외이다.
+     * @throws OptimisticLockingFailureException 락에 의해 생성 실패하였다.
      */
-    public BrandDto newBrand(@NonNull BrandDto brandDto) {
-        Brand src = brandDto.toEntity();
-        try {
-            // 신규생성은 DB 오류를 제외하면 반드시 성공해야한다.
-            // BrandDto의 id는 외부 패키지에서는 읽기 전용이므로, 임의로 쓰기 대신 수정을 일으킬 수는 없다.
-            // 따라서 save 트랜잭션은 반드시 entity를 반환하거나, 예외를 일으킨다.
-            return BrandDto.fromEntity(this.brandRepository.save(src));
-        } catch (OptimisticLockingFailureException e) {
-            e.printStackTrace();
-            throw new DummyException(e);
-        }
+    public BrandDto createBrand(@NonNull BrandDto brandDto) {
+        Brand expected = this.brandMapper.toEntity(brandDto);
+        Brand actual = this.brandRepository.create(expected);
+        return this.brandMapper.fromEntity(actual);
     }
 
     /**
-     * 브랜드를 수정한다. 만약 수정하려는 브랜드가 없다면 빈 Optional을 반환한다.
-     * @param id 수정하려는 브랜드 식별자
-     * @param brandDto 수정하려는 브랜드 정보. 식별자를 제외한 모든 값을 수정한다.
-     * @return 성공시 수정한 브랜드를 감싼, 그 외에는 비어있는 Optional을 반환한다.
-     * @throws DummyException 브랜드 수정 실패시 발생하는 예외이다.
+     * 브랜드를 수정한다. 만약 수정하려는 브랜드가 없거나 수정에 실패했다면 예외를 반환한다.
+     * @param id 수정하려는 브랜드 ID.
+     * @param brandDto 수정하려는 브랜드 DTO.
+     * @return 수정한 브랜드 DTO. null일 수 없다.
+     * @throws ResourceNotFoundException 수정하려는 브랜드가 존재하지 않는다.
      */
     @Transactional
-    public Optional<BrandDto> updateBrand(int id, @NonNull BrandDto brandDto) {
-        Brand src = brandDto.toEntity();
+    public BrandDto updateBrand(int id, @NonNull BrandDto brandDto) {
         try {
-            // 수정은 배타적 읽기 -> 쓰기 순으로 진행한다. 만약 레코드가 없다면 빈 Optional을, 수정에 성공하면 수정한 레코드를 포함하는 Optional을 반환한다.
-            // 만약 락 획득 실패, DB오류등의 경우에는 예외를 반환한다.
-            // 배타적 락이 없다면...
-            // - 읽고(A) -> 지우고(B) -> 수정(A) -> True negative
-            // - 읽고(A) -> 지우고(B) -> 생성(A) -> False Positive
-            // 의 경우가 발생할 수 있다.
-            return this.brandRepository.updateById(id, src).flatMap(entity -> Optional.of(BrandDto.fromEntity(entity)));
-        } catch (OptimisticLockingFailureException e) {
-            e.printStackTrace();
-            throw new DummyException(e);
+            return this.brandMapper.fromEntity(this.brandRepository.update(id, this.brandMapper.toEntity(brandDto)));
+        } catch (RepositoryEntityNotExistException e) {
+            throw new ResourceNotFoundException();
         }
     }
 
     /**
-     * 브랜드를 삭제한다.
-     * @param id 삭제할 브랜드 식별자
+     * 브랜드를 삭제한다. 만약 삭제하려는 브랜드가 없거나 삭제에 실패했다면 예외를 반환한다.
+     * @param id 삭제하려믄 브랜드 ID.
+     * @throws ResourceNotFoundException 삭제하려는 브랜드가 존재하지 않는다.
      */
     public void deleteBrand(int id) {
-        this.brandRepository.deleteById(id);
+        try {
+            this.brandRepository.delete(id);
+        } catch (RepositoryEntityNotExistException e) {
+            throw new ResourceNotFoundException();
+        }
     }
 
     /**
@@ -105,7 +105,7 @@ public class AdminService {
      * @return 해당 상품을 감싼, 그 외에는 비어있는 Optional을 반환한다.
      */
     public Optional<ProductDto> getProduct(long id) {
-        return this.productRepository.findById(id).flatMap(entity -> Optional.of(ProductDto.fromEntity(entity)));
+        return this.productRepositoryImpl.findById(id).flatMap(entity -> Optional.of(ProductDto.fromEntity(entity)));
     }
 
     /**
@@ -113,7 +113,7 @@ public class AdminService {
      * @return 상품 리스트
      */
     public List<ProductDto> getProducts() {
-        return ProductDto.fromEntities(this.productRepository.findAll());
+        return ProductDto.fromEntities(this.productRepositoryImpl.findAll());
     }
 
     /**
@@ -122,7 +122,7 @@ public class AdminService {
      * @return 상품 리스트
      */
     public List<ProductDto> getProductsByBrandName(String brandName) {
-        return ProductDto.fromEntities(this.productRepository.findByBrandName(brandName));
+        return ProductDto.fromEntities(this.productRepositoryImpl.findByBrandName(brandName));
     }
 
     /**
@@ -131,7 +131,7 @@ public class AdminService {
      * @return 상품 리스트
      */
     public List<ProductDto> getProductsByBrandId(int brandId) {
-        return ProductDto.fromEntities(this.productRepository.findByBrandId(brandId));
+        return ProductDto.fromEntities(this.productRepositoryImpl.findByBrandId(brandId));
     }
 
     // TODO 예외처리 어떻게 할지.
@@ -151,7 +151,7 @@ public class AdminService {
                 .brand(brand.get())
                 .price(productDto.getPrice())
                 .build();
-        return ProductDto.fromEntity(productRepository.save(product));
+        return ProductDto.fromEntity(productRepositoryImpl.save(product));
     }
 
     // TODO 예외처리 어떻게 할지.
@@ -171,7 +171,7 @@ public class AdminService {
                 .brand(brand.get())
                 .price(productDto.getPrice())
                 .build();
-        return this.productRepository.updateById(id, product).flatMap(entity -> Optional.of(ProductDto.fromEntity(entity)));
+        return this.productRepositoryImpl.updateById(id, product).flatMap(entity -> Optional.of(ProductDto.fromEntity(entity)));
     }
 
     /**
@@ -179,6 +179,6 @@ public class AdminService {
      * @param id 삭제할 상품의 식별자.
      */
     public void deleteProduct(long id) {
-        this.productRepository.deleteById(id);
+        this.productRepositoryImpl.deleteById(id);
     }
 }

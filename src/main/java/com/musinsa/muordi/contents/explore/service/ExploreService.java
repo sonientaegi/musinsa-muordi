@@ -40,7 +40,7 @@ public class ExploreService {
      */
     protected PriceRecordWithNameDto populateNameField(PriceRecordDto result) {
         CategoryDto category = this.displayService.getCategory(result.getCategoryId()).orElseThrow(() -> new RuntimeException("Category not found"));
-        BrandDto brand = this.adminService.getBrand(result.getBrandId()).orElseThrow(() -> new RuntimeException("Brand not found"));
+        BrandDto brand = this.adminService.getBrand(result.getBrandId());
         return PriceRecordWithNameDto.builder()
                 .categoryName(category.getName())
                 .brandName(brand.getName())

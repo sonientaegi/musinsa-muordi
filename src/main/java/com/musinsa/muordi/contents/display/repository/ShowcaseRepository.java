@@ -39,7 +39,6 @@ public class ShowcaseRepository {
         return this.repository.findByProduct_Brand_Id(brandId);
     }
 
-
     /**
      * 상품의 브랜드 명칭으로 쇼케이스를 조회한다.
      * @param brandName 조회할 브랜드 명칭.
@@ -93,6 +92,6 @@ public class ShowcaseRepository {
     public Optional<Showcase> updateByProductId(long productId, Showcase showcase) {
         Showcase target = this.findByProductId(productId).orElseThrow(()->new RuntimeException("Product with id " + productId + " not found"));
         target.setCategory(showcase.getCategory());
-        return this.repository.updateById(target.getId(), target);
+        return Optional.ofNullable(this.repository.updateById(target.getId(), target));
     }
 }

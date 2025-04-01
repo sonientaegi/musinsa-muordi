@@ -1,7 +1,7 @@
 package com.musinsa.muordi.platform.admin.dto;
 
 import com.musinsa.muordi.platform.admin.repository.Brand;
-import com.musinsa.muordi.platform.admin.repository.BrandRepositoryTest;
+import com.musinsa.muordi.platform.admin.repository.BrandRepositoryJpaWrapper2Wrapper2Test;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -12,7 +12,7 @@ class BrandDtoTest {
     // Brand -> DTO 변환 검증.
     @Test
     void fromEntity() {
-        Brand brand = BrandRepositoryTest.sample();
+        Brand brand = BrandRepositoryJpaWrapper2Wrapper2Test.sample();
 
         BrandDto brandDto = BrandDto.fromEntity(brand);
         assertEquals(brand.getId(), brandDto.getId());
@@ -23,10 +23,10 @@ class BrandDtoTest {
     @Test
     void fromEntities() {
         List<Brand> brands = List.of(
-                BrandRepositoryTest.sample(),
-                BrandRepositoryTest.sample(),
-                BrandRepositoryTest.sample(),
-                BrandRepositoryTest.sample()
+                BrandRepositoryJpaWrapper2Wrapper2Test.sample(),
+                BrandRepositoryJpaWrapper2Wrapper2Test.sample(),
+                BrandRepositoryJpaWrapper2Wrapper2Test.sample(),
+                BrandRepositoryJpaWrapper2Wrapper2Test.sample()
         );
 
         List<BrandDto> brandDtos = BrandDto.fromEntities(brands);

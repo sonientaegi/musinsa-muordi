@@ -1,12 +1,16 @@
 package com.musinsa.muordi.platform.admin.controller;
 
 import com.musinsa.muordi.platform.admin.dto.BrandDto;
+import com.musinsa.muordi.platform.admin.dto.BrandDtoMapper;
+import com.musinsa.muordi.platform.admin.dto.BrandRequest;
 import com.musinsa.muordi.platform.admin.dto.ProductDto;
+import com.musinsa.muordi.platform.admin.dto.BrandResponse;
 import com.musinsa.muordi.platform.admin.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequestMapping("/api/admin/v1")
 @RequiredArgsConstructor
@@ -15,33 +19,32 @@ public class AdminController {
     // 어드민 서비스
     private final AdminService adminService;
 
-    @PostMapping("/brand")
-    public BrandDto newBrand(@RequestBody BrandDto brandDto) {
-        BrandDto newBrandDto = this.adminService.newBrand(brandDto);
-        if (newBrandDto == null) {
-            throw new RuntimeException("fail");
-        } else {
-            return newBrandDto;
-        }
-    }
+    // request/response - DTO 맵퍼
+    private final BrandDtoMapper brandMapper = BrandDtoMapper.instance;
 
     @GetMapping("/brand")
-    public List<BrandDto> getBrand() {
-        return this.adminService.getBrands();
+    public List<BrandResponse> getBrand() {
+        return this.adminService.getBrands().stream().map(this.brandMapper::toResponse).toList();
+    }
+
+    @PostMapping("/brand")
+    public BrandResponse createBrand(@RequestBody BrandRequest request) {
+        BrandDto newBrandDto = this.adminService.createBrand(this.brandMapper.fromRequest(request));
+        return this.brandMapper.toResponse(newBrandDto);
     }
 
     @GetMapping("/brand/{id}")
-    public BrandDto getBrand(@PathVariable int id) {
-        return this.adminService.getBrand(id).orElse(null);
+    public BrandResponse getBrand(@PathVariable int id) {
+        return this.brandMapper.toResponse(this.adminService.getBrand(id));
     }
 
     @PutMapping("/brand/{id}")
-    public BrandDto updateBrand(@PathVariable int id, @RequestBody BrandDto brandDto) {
-        BrandDto updatedBrandDto = this.adminService.updateBrand(id, brandDto).orElse(null);
+    public BrandResponse updateBrand(@PathVariable int id, @RequestBody BrandDto brandDto) {
+        BrandDto updatedBrandDto = this.adminService.updateBrand(id, brandDto);
         if (updatedBrandDto == null) {
             throw new RuntimeException("fail");
         } else {
-            return updatedBrandDto;
+            return this.brandMapper.toResponse(updatedBrandDto);
         }
     }
 

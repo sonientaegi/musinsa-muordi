@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test-admin-product")
 @SpringBootTest
-public class ProductRepositoryTest {
+public class ProductRepositoryImplTest {
     /*
     주의.
     JPA에서 FK 참조를 할때 EAGER 모드로 설정해도 Test 환경에서는 LAZY로 동작한다. 반드시 Transaction 설정하고 TC 구현할것.
@@ -26,14 +26,14 @@ public class ProductRepositoryTest {
      * @return
      */
     public static Product sample() {
-        return new Product(1l, BrandRepositoryTest.sample(), 50000);
+        return new Product(1l, BrandRepositoryJpaWrapper2Wrapper2Test.sample(), 50000);
     }
 
     @Autowired
-    private BrandRepository brandRepository;
+    private BrandRepositoryJpa2 brandRepositoryJpa2;
 
     @Autowired
-    private ProductRepository repository;
+    private ProductRepositoryImpl repository;
 
     // 테스트케이스
     private Map<Long, Product> testCases = new HashMap<>();
@@ -42,7 +42,7 @@ public class ProductRepositoryTest {
     void setUp() {
         // 각 브랜드별로 두개씩 상품을 생성해준다.
         Random rand = new Random();
-        this.brandRepository.findAll().forEach(brand -> {
+        this.brandRepositoryJpa2.findAll().forEach(brand -> {
             IntStream.range(0, 2).forEach(i -> {
                 Product product = Product.builder()
                         .brand(brand)

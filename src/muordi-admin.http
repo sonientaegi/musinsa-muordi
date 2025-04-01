@@ -21,7 +21,7 @@ GET http://{{host}}/api/admin/v1/brand
 GET http://{{host}}/api/admin/v1/brand/2
 
 ### 브랜드 삭제
-DELETE http://{{host}}/api/admin/v1/brand/2
+DELETE http://{{host}}/api/admin/v1/brand/29
 
 ### 상품 조회
 GET http://{{host}}/api/admin/v1/product

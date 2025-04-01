@@ -33,7 +33,7 @@ import java.util.List;
 })
 public class Brand implements Serializable, EntityUpdate<Brand> {
     @Id
-    @Setter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.PACKAGE)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
@@ -50,7 +50,7 @@ public class Brand implements Serializable, EntityUpdate<Brand> {
 
     /**
      * 신규 브랜드 생성에 사용하는 생성자. 브랜드의 이름을 지정한 객체를 생성한 다음
-     * {@link BrandRepository#save(Object)} 또는 {@link BrandRepository#saveAll(Iterable)}를 호출하여 새로운 브랜드 레코드를 생성한다.
+     * {@link BrandRepositoryJpa2#save(Object)} 또는 {@link BrandRepositoryJpa2#saveAll(Iterable)}를 호출하여 새로운 브랜드 레코드를 생성한다.
      * @param name 브랜드 명칭
      */
     @Builder
