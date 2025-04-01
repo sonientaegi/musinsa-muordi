@@ -39,16 +39,15 @@ public class ExploreService {
      * @return
      */
     protected PriceRecordWithNameDto populateNameField(PriceRecordDto result) {
-        return null;
-//        CategoryDto category = this.displayService.getCategory(result.getCategoryId()).orElseThrow(() -> new RuntimeException("Category not found"));
-//        BrandDto brand = this.adminService.getBrand(result.getBrandId());
-//        return PriceRecordWithNameDto.builder()
-//                .categoryName(category.getName())
-//                .brandName(brand.getName())
-//                .categoryId(result.getCategoryId())
-//                .brandId(result.getBrandId())
-//                .price(result.getPrice())
-//                .build();
+        CategoryDto category = this.displayService.getCategory(result.getCategoryId());
+        BrandDto brand = this.adminService.getBrand(result.getBrandId());
+        return PriceRecordWithNameDto.builder()
+                .categoryName(category.getName())
+                .brandName(brand.getName())
+                .categoryId(result.getCategoryId())
+                .brandId(result.getBrandId())
+                .price(result.getPrice())
+                .build();
     }
 
     /**
@@ -102,46 +101,45 @@ public class ExploreService {
      * @return 최댓값, 최솟값 가격정보.
      */
     public PriceRangeOfCategoryDto PriceRangeofCategoryByName(String categoryName) {
-        return null;
-//        // 카테고리 식별자를 구한다.
-//        // TODO 카테고리 없으면부 예외 처리로 반환하자.
-//        CategoryDto category = this.displayService.getCategoryByName(categoryName).orElseThrow(() -> new RuntimeException("Category not found"));
-//        int categoryId = category.getId();
-//
-//        // 최대, 최소금액 구하는 작업은 동일한 API이므로 병렬로 동시 수행할 수 있다.
-//        final PriceRecordWithNameDto results[] = {null, null};
-//        List<Thread> threads = List.of(
-//                // 최댓값 구하기
-//                new Thread(() -> {
-//                    results[0] = this.populateNameField(this.exploreRepository.getMinPriceOfCategory(categoryId).orElse(null));
-//                }),
-//                // 최솟값 구하기
-//                new Thread(() -> {
-//                    results[1] = this.populateNameField(this.exploreRepository.getMaxPriceOfCategory(categoryId).orElse(null));
-//                })
-//        );
-//
-//        // 동시 수행
-//        for (Thread thread : threads) {
-//            thread.start();
-//        }
-//
-//        // TODO 오류, 예외 처리 필요.
-//
-//        // 두 작업이 모두 종료할 때 까지 대기.
-//        try {
-//            for (Thread thread : threads) {
-//                thread.join(Duration.ofSeconds(10));
-//            }
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//        return PriceRangeOfCategoryDto.builder()
-//                .minPriceRecord(results[0])
-//                .maxPriceRecord(results[1])
-//                .categoryId(results[0].getCategoryId())
-//                .categoryName(results[0].getCategoryName())
-//                .build();
+        // 카테고리 식별자를 구한다.
+        // TODO 카테고리 없으면부 예외 처리로 반환하자.
+        CategoryDto category = this.displayService.getCategoryByName(categoryName);
+        int categoryId = category.getId();
+
+        // 최대, 최소금액 구하는 작업은 동일한 API이므로 병렬로 동시 수행할 수 있다.
+        final PriceRecordWithNameDto results[] = {null, null};
+        List<Thread> threads = List.of(
+                // 최댓값 구하기
+                new Thread(() -> {
+                    results[0] = this.populateNameField(this.exploreRepository.getMinPriceOfCategory(categoryId).orElse(null));
+                }),
+                // 최솟값 구하기
+                new Thread(() -> {
+                    results[1] = this.populateNameField(this.exploreRepository.getMaxPriceOfCategory(categoryId).orElse(null));
+                })
+        );
+
+        // 동시 수행
+        for (Thread thread : threads) {
+            thread.start();
+        }
+
+        // TODO 오류, 예외 처리 필요.
+
+        // 두 작업이 모두 종료할 때 까지 대기.
+        try {
+            for (Thread thread : threads) {
+                thread.join(Duration.ofSeconds(10));
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        return PriceRangeOfCategoryDto.builder()
+                .minPriceRecord(results[0])
+                .maxPriceRecord(results[1])
+                .categoryId(results[0].getCategoryId())
+                .categoryName(results[0].getCategoryName())
+                .build();
     }
 }
