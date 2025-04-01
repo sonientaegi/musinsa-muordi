@@ -1,5 +1,6 @@
 package com.musinsa.muordi.platform.admin.repository;
 
+import com.musinsa.muordi.common.exception.RepositoryEntityIntegrityViolation;
 import com.musinsa.muordi.common.exception.RepositoryEntityNotExistException;
 import lombok.NonNull;
 import org.hibernate.PessimisticLockException;
@@ -12,9 +13,15 @@ import java.util.Optional;
  */
 public interface BrandRepository {
     /**
+     * 모든 브랜드를 반환한다.
+     * @return 브랜드 entity 리스트를 반환한다.
+     */
+    List<Brand> findAll();
+
+    /**
      * ID로 브랜드를 조회한다. ID는 브랜드의 유일한 식별자이며 두개이상의 같은값은 존재하지 않는다.
      * @param id 브랜드 ID
-     * @return Optional로 감싼 브랜드 entity. 미발견 시 빈 Optional을 반환한다. null 일 수 없다.
+     * @return Optional로 감싼 브랜드 entity, 미발견 시 빈 Optional을 반환한다. null 일 수 없다.
      */
     Optional<Brand> findById(int id);
 
@@ -26,21 +33,15 @@ public interface BrandRepository {
     List<Brand> findByName(String name);
 
     /**
-     * 모든 브랜드를 반환한다.
-     * @return 브랜드 entity 리스트를 반환한다.
-     */
-    List<Brand> findAll();
-
-    /**
      * 새로운 브랜드를 생성한다. 실패시 Repository 구현체에서 예외를 반환한다.
      * @param brand 생성할 브랜드.
-     * @return 생성한 브랜드 entity. 브랜드 ID를 포함한다. null일 수 없다.
+     * @return 생성한 브랜드 entity. 브랜드 ID를 포함한다. null 일 수 없다.
      */
     Brand create(@NonNull Brand brand);
 
     /**
      * 기존의 브랜드를 수정한다. 이 동작은 원자적 실행을 지원한다. 만약 ID로 브랜드를 발견하지 못한다면 예외를 반환한다.
-     * @param id 수정할 브랜드 ID
+     * @param id 수정할 브랜드 ID.
      * @param brand 수정할 브랜드 내용.
      * @return 수정한 브랜드 entity. null 일 수 없다.
      * @throws RepositoryEntityNotExistException 수정하려는 브랜드가 존재하지 않는다.
@@ -53,6 +54,7 @@ public interface BrandRepository {
      * @param id 삭제할 브랜드 ID.
      * @return 삭제 한 브랜드 entity. null 일 수 없다.
      * @throws RepositoryEntityNotExistException 삭제하려는 브랜드가 존재하지 않는다.
+     * @throws RepositoryEntityIntegrityViolation 정합성 오류로 인해 브랜드를 삭제할 수 없다.
      */
     Brand delete(int id);
 }

@@ -9,12 +9,12 @@ import org.mapstruct.factory.Mappers;
 public interface BrandDtoMapper {
     BrandDtoMapper instance = Mappers.getMapper(BrandDtoMapper.class);
 
-    BrandDto fromEntity(Brand brand);
+    BrandDto fromEntity(Brand entity);
 
 //    @Mapping(target = "products", ignore = true)
-    Brand toEntity(BrandDto brandDto);
+    Brand toEntity(BrandDto doto);
 
-    BrandResponse toResponse(BrandDto brandDto);
+    BrandResponse toResponse(BrandDto dto);
 
     BrandDto fromRequest(BrandRequest request);
 }

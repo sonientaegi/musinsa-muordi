@@ -10,12 +10,17 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * 브랜드 JpaRepository 의 래퍼이다.
+ * 브랜드 JpaRepository의 래퍼이다.
  */
 @RequiredArgsConstructor
 @Repository
 public class BrandRepositoryJpaWrapper implements BrandRepository {
     private final BrandRepositoryJpa repository;
+
+    @Override
+    public List<Brand> findAll() {
+        return this.repository.findAll();
+    }
 
     @Override
     public Optional<Brand> findById(int id) {
@@ -25,11 +30,6 @@ public class BrandRepositoryJpaWrapper implements BrandRepository {
     @Override
     public List<Brand> findByName(String name) {
         return this.repository.findByName(name);
-    }
-
-    @Override
-    public List<Brand> findAll() {
-        return this.repository.findAll();
     }
 
     @Override

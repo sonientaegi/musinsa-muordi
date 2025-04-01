@@ -7,22 +7,21 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * 상품 DML을 정의한다.
+ * 상품 JpaRepository 확장 명세이다.
  */
 @Component
 interface ProductRepositoryJpa extends JpaRepository<Product, Long>, AtomicUpdateById<Product, Long> {
     /**
-     * 브랜드 명칭으로 상품을 조회한다.
-     * @param brandName 조회 할 상품의 브랜드 명칭.
-     * @return 발견한 브랜드 리스트, 또는 빈 리스트.
+     * SELECT * FROM PRODUCT
+     * WHERE brand_id = :brandId
      */
-    List<Product> findProductByBrand_Name(String brandName);
+    List<Product> findProductByBrand_Id(int brandId);
 
     /**
-     * 브랜드 식별자로 상품을 조회한다.
-     * @param id 조회할 상품의 브랜드 식별자.
-     * @return 발견한 브랜드 리스트, 또는 빈 리스트.
+     * SELECT * FROM PRODUCT
+     * INNER JOIN BRAND ON brand_id = BRAND.id
+     * WHERE BRAND.brand_name = :brandName
      */
-    List<Product> findProductByBrand_Id(int id);
+    List<Product> findProductByBrand_Name(String brandName);
 }
 

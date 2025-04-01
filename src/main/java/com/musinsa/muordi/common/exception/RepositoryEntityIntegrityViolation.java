@@ -8,6 +8,7 @@ public class RepositoryEntityIntegrityViolation extends RepositoryException {
     protected final String action;
 
     protected RepositoryEntityIntegrityViolation(String repository, Object key, String action, int code) {
+        // "Repository " + repository + " 의 key=" + key + "를 " + action + " 하는것은 데이터 무결성을 해칩니다."
         super(repository, code);
 
         this.key = key;
@@ -15,6 +16,6 @@ public class RepositoryEntityIntegrityViolation extends RepositoryException {
     }
 
     public RepositoryEntityIntegrityViolation(String repository, String action, Object key) {
-        this("Repository " + repository + " 의 key=" + key + "를 " + action + " 하는것은 데이터 무결성을 해칩니다.", key, action,103);
+        this(repository, key, action,103);
     }
 }

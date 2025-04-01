@@ -1,16 +1,11 @@
 package com.musinsa.muordi.platform.admin.controller;
 
-import com.musinsa.muordi.platform.admin.dto.BrandDto;
-import com.musinsa.muordi.platform.admin.dto.BrandDtoMapper;
-import com.musinsa.muordi.platform.admin.dto.BrandRequest;
-import com.musinsa.muordi.platform.admin.dto.ProductDto;
-import com.musinsa.muordi.platform.admin.dto.BrandResponse;
+import com.musinsa.muordi.platform.admin.dto.*;
 import com.musinsa.muordi.platform.admin.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequestMapping("/api/admin/v1")
 @RequiredArgsConstructor
@@ -21,6 +16,7 @@ public class AdminController {
 
     // request/response - DTO 맵퍼
     private final BrandDtoMapper brandMapper = BrandDtoMapper.instance;
+    private final ProductDtoMapper productMapper = ProductDtoMapper.instance;
 
     @GetMapping("/brand")
     public List<BrandResponse> getBrand() {
@@ -40,12 +36,7 @@ public class AdminController {
 
     @PutMapping("/brand/{id}")
     public BrandResponse updateBrand(@PathVariable int id, @RequestBody BrandDto brandDto) {
-        BrandDto updatedBrandDto = this.adminService.updateBrand(id, brandDto);
-        if (updatedBrandDto == null) {
-            throw new RuntimeException("fail");
-        } else {
-            return this.brandMapper.toResponse(updatedBrandDto);
-        }
+        return this.brandMapper.toResponse(this.adminService.updateBrand(id, brandDto));
     }
 
     @DeleteMapping("/brand/{id}")
@@ -54,33 +45,35 @@ public class AdminController {
     }
 
     @GetMapping("/product")
-    public List<ProductDto> getProducts() {
-        return this.adminService.getProducts();
+    public List<ProductResponse> getProducts() {
+        return this.adminService.getProducts().stream().map(this.productMapper::toResponse).toList();
     }
 
     @GetMapping("/product/{id}")
-    public ProductDto getProduct(@PathVariable int id) {
-        return this.adminService.getProduct(id).orElse(null);
+    public ProductResponse getProduct(@PathVariable int id) {
+        return this.productMapper.toResponse(this.adminService.getProduct(id));
     }
 
     @GetMapping("/product/brand/{id}")
-    public List<ProductDto> getProductsByBrand(@PathVariable int id) {
-        return this.adminService.getProductsByBrandId(id);
+    public List<ProductResponse> getProductsByBrand(@PathVariable int id) {
+        return this.adminService.getProductsByBrandId(id).stream().map(this.productMapper::toResponse).toList();
     }
 
     @GetMapping("/product/brand/name/{name}")
-    public List<ProductDto> getProductsByBrandName(@PathVariable String name) {
-        return this.adminService.getProductsByBrandName(name);
+    public List<ProductResponse> getProductsByBrandName(@PathVariable String name) {
+        return this.adminService.getProductsByBrandName(name).stream().map(this.productMapper::toResponse).toList();
     }
 
     @PostMapping("/product")
-    public ProductDto newProduct(@RequestBody ProductDto productDto) {
-        return this.adminService.newProduct(productDto);
+    public ProductResponse createProduct(@RequestBody ProductRequest request) {
+        return this.productMapper.toResponse(this.adminService.createProduct(this.productMapper.fromRequest(request)));
     }
 
     @PutMapping("/product/{id}")
-    public ProductDto updateProduct(@PathVariable int id, @RequestBody ProductDto productDto) {
-        return this.adminService.updateProduct(id, productDto).orElse(null);
+    public ProductResponse updateProduct(@PathVariable long id, @RequestBody ProductRequest request) {
+        return this.productMapper.toResponse(
+                this.adminService.updateProduct(id, this.productMapper.fromRequest(request))
+        );
     }
 
     @DeleteMapping("/product/{id}")

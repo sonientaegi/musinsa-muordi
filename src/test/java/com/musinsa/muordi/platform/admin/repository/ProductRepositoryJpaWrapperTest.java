@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test-admin-product")
 @SpringBootTest
-public class ProductRepositoryImplTest {
+public class ProductRepositoryJpaWrapperTest {
     /*
     주의.
     JPA에서 FK 참조를 할때 EAGER 모드로 설정해도 Test 환경에서는 LAZY로 동작한다. 반드시 Transaction 설정하고 TC 구현할것.
@@ -33,7 +33,7 @@ public class ProductRepositoryImplTest {
     private BrandRepositoryJpa2 brandRepositoryJpa2;
 
     @Autowired
-    private ProductRepositoryImpl repository;
+    private ProductRepositoryJpaWrapper repository;
 
     // 테스트케이스
     private Map<Long, Product> testCases = new HashMap<>();

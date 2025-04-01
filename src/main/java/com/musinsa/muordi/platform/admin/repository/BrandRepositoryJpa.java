@@ -11,5 +11,9 @@ import java.util.List;
  */
 @Repository
 public interface BrandRepositoryJpa extends JpaRepository<Brand, Integer>, AtomicUpdateById<Brand, Integer> {
+    /**
+     * SELECT * FROM BRAND
+     * WHERE name = :name
+     */
     List<Brand> findByName(String name);
 }

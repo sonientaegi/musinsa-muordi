@@ -4,7 +4,7 @@ import com.musinsa.muordi.contents.display.dto.CategoryDto;
 import com.musinsa.muordi.contents.display.dto.ShowcaseDto;
 import com.musinsa.muordi.contents.display.repository.*;
 import com.musinsa.muordi.platform.admin.repository.Product;
-import com.musinsa.muordi.platform.admin.repository.ProductRepositoryImpl;
+import com.musinsa.muordi.platform.admin.repository.ProductRepositoryJpaWrapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ import java.util.Optional;
 @Service
 public class DisplayService {
     private final CategoryRepository categoryRepository;
-    private final ProductRepositoryImpl productRepositoryImpl;
+    private final ProductRepositoryJpaWrapper productRepositoryJpaWrapper;
     private final ShowcaseRepository showcaseRepository;
 
     /**
@@ -128,7 +128,7 @@ public class DisplayService {
         }
 
         // 상품 존재 여부를 검증한다.
-        Product product = this.productRepositoryImpl.findById(productId).orElseThrow(() -> new RuntimeException(productId + " not found"));
+        Product product = this.productRepositoryJpaWrapper.findById(productId).orElseThrow(() -> new RuntimeException(productId + " not found"));
 
         // 카테고리 존재 여부를 검증한다.
         Category category = this.categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException(categoryId + " not found"));

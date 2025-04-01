@@ -195,13 +195,13 @@ class AdminServiceTest {
     @Test
     @Transactional
     @DisplayName("domain.product : 신규 상품 생성")
-    void testNewProduct() {
+    void testCreateProduct() {
         BrandDto expectedBrand = this.randBrand();
         ProductDto expected = ProductDto.builder()
                 .brandId(expectedBrand.getId())
                 .price(new Random().nextInt(100000))
                 .build();
-        ProductDto actual = this.service.newProduct(expected);
+        ProductDto actual = this.service.createProduct(expected);
         assertNotNull(actual);
         assertEquals(expected.getBrandId(), actual.getBrandId());
         assertEquals(expectedBrand.getName(), actual.getBrandName());
