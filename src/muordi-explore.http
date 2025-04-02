@@ -5,4 +5,4 @@ GET http://{{host}}/api/explore/v1/coordi/affordable
 GET http://{{host}}/api/explore/v1/coordi/affordable/brand
 
 ### 문제 3
-GET http://{{host}}/api/explore/v1/coordi/category/%EC%83%81%EC%9D%98/price/range
+GET http://{{host}}/api/explore/v1/coordi/category/price/range?name=상의

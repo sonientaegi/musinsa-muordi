@@ -3,10 +3,7 @@ package com.musinsa.muordi.contents.explore.controller;
 import com.musinsa.muordi.contents.explore.dto.*;
 import com.musinsa.muordi.contents.explore.service.ExploreService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 탐색 도메인 컨트롤러.
@@ -29,8 +26,8 @@ public class ExploreController {
         return BrandCheapestResponse.fromDto(dto);
     }
 
-    @GetMapping("/coordi/category/{name}/price/range")
-    public CategoryPriceRangeResponse getCategoryPriceRange(@PathVariable String name) {
+    @GetMapping("/coordi/category/price/range")
+    public CategoryPriceRangeResponse getCategoryPriceRange(@RequestParam String name) {
         CategoryPriceRangeDto dto = this.exploreService.PriceRangeofCategoryByName(name);
         return CategoryPriceRangeResponse.fromDto(dto);
     }

@@ -1,4 +1,4 @@
-package com.musinsa.muordi;
+package com.musinsa.muordi.controller;
 
 import com.musinsa.muordi.common.exception.BaseException;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class MuordiExceptionController {
+public class ExceptionHandlerAdvice {
     @Getter
     @Builder
     static class BaseErrorResponse<T> {
