@@ -1,7 +1,9 @@
 package com.musinsa.muordi.contents.display.service;
 
 import com.musinsa.muordi.contents.display.dto.CategoryDto;
+import com.musinsa.muordi.contents.display.dto.CategoryDtoMapper;
 import com.musinsa.muordi.contents.display.dto.ShowcaseDto;
+import com.musinsa.muordi.contents.display.dto.ShowcaseDtoMapper;
 import com.musinsa.muordi.contents.display.repository.Showcase;
 import com.musinsa.muordi.contents.display.repository.ShowcaseRepositoryJpaWrapper;
 import jakarta.transaction.Transactional;
@@ -27,13 +29,17 @@ class DisplayServiceTest {
     @Autowired
     private ShowcaseRepositoryJpaWrapper showcaseRepositoryJpaWrapper;
 
+    // entity - DTO 맵퍼
+    private final CategoryDtoMapper categoryDtoMapper = CategoryDtoMapper.instance;
+    private final ShowcaseDtoMapper showcaseDtoMapper = ShowcaseDtoMapper.instance;
+
     /**
      * 무작위로 한개의 쇼케이스 레코드를 선택한다.
      *
      */
     private ShowcaseDto randShowcase() {
         List<Showcase> showcases = this.showcaseRepositoryJpaWrapper.findAll();
-        return ShowcaseDto.fromEntity(showcases.get(new Random().nextInt(showcases.size())));
+        return this.showcaseDtoMapper.fromEntity(showcases.get(new Random().nextInt(showcases.size())));
     }
 
     @Test
@@ -56,9 +62,8 @@ class DisplayServiceTest {
     @DisplayName("상품 식별자로 쇼케이스 조회")
     void getShowcase() {
         ShowcaseDto expected = this.randShowcase();
-        Optional<ShowcaseDto> optActual = this.displayService.getShowcase(expected.getProductId());
-        assertTrue(optActual.isPresent());
-        ShowcaseDto actual = optActual.get();
+        ShowcaseDto actual = this.displayService.getShowcase(expected.getProductId());
+        assertNotNull(actual);
         assertEquals(expected, actual);
     }
 
@@ -123,9 +128,8 @@ class DisplayServiceTest {
             expectedCategoryId = this.randShowcase().getCategoryId();
         }
 
-        Optional<ShowcaseDto> optActual = this.displayService.updateShowcase(target.getProductId(), expectedCategoryId);
-        assertTrue(optActual.isPresent());
-        ShowcaseDto actual = optActual.get();
+        ShowcaseDto actual = this.displayService.updateShowcase(target.getProductId(), expectedCategoryId);
+        assertNotNull(actual);
         assertEquals(target.getProductId(), actual.getProductId());
         assertEquals(expectedCategoryId, actual.getCategoryId());
     }

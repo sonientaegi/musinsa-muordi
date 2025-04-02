@@ -26,11 +26,11 @@ public class ProductRepositoryJpaWrapperTest {
      * @return
      */
     public static Product sample() {
-        return new Product(1l, BrandRepositoryJpaWrapper2Wrapper2Test.sample(), 50000);
+        return new Product(1l, BrandRepositoryJpaWrapperTest.sample(), 50000);
     }
 
     @Autowired
-    private BrandRepositoryJpa2 brandRepositoryJpa2;
+    private BrandRepository brandRepository;
 
     @Autowired
     private ProductRepositoryJpaWrapper repository;
@@ -42,13 +42,13 @@ public class ProductRepositoryJpaWrapperTest {
     void setUp() {
         // 각 브랜드별로 두개씩 상품을 생성해준다.
         Random rand = new Random();
-        this.brandRepositoryJpa2.findAll().forEach(brand -> {
+        this.brandRepository.findAll().forEach(brand -> {
             IntStream.range(0, 2).forEach(i -> {
                 Product product = Product.builder()
                         .brand(brand)
                         .price(rand.nextInt(1000, 100000))
                         .build();
-                Product testCase = this.repository.save(product);
+                Product testCase = this.repository.create(product);
                 this.testCases.put(testCase.getId(), testCase);
             });
         });
@@ -135,7 +135,7 @@ public class ProductRepositoryJpaWrapperTest {
                 .brand(this.randProduct().getBrand())
                 .price(new Random().nextInt(1000, 100000))
                 .build();
-        Product actual = this.repository.save(expected);
+        Product actual = this.repository.create(expected);
         assertNotNull(actual);
         assertNotNull(actual.getId());
         assertNotNull(actual.getBrand());
@@ -158,7 +158,7 @@ public class ProductRepositoryJpaWrapperTest {
                 .brand(expectedBrand)
                 .price(new Random().nextInt(1000, 100000))
                 .build();
-        Product actual = this.repository.updateById(testCase.getId(), expected).orElse(null);
+        Product actual = this.repository.update(testCase.getId(), expected);
         assertNotNull(actual);
         assertEquals(expected.getBrand(), actual.getBrand());
         assertEquals(expected.getPrice(), actual.getPrice());
@@ -170,7 +170,7 @@ public class ProductRepositoryJpaWrapperTest {
     @Transactional
     void testDelete() {
         Product testCase = this.randProduct();
-        this.repository.deleteById(testCase.getId());
+        this.repository.delete(testCase.getId());
         Product actual = this.repository.findById(testCase.getId()).orElse(null);
         assertNull(actual);
     }
@@ -186,11 +186,6 @@ public class ProductRepositoryJpaWrapperTest {
 
         // TODO 존재하지 않는 상품 수정 시 exception / null 어떻게 처리할지 고민.
         // 예외 발생 : ObjectOptimisticLockingFailureException
-        Optional<Product> actual = this.repository.updateById(Integer.MIN_VALUE, expected);
+        Product actual = this.repository.update(Integer.MIN_VALUE, expected);
     }
-
-
-//    @AfterEach
-//    void tearDown() {
-//    }
 }

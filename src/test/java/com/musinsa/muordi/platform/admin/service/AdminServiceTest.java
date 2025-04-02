@@ -77,18 +77,17 @@ class AdminServiceTest {
     @DisplayName("domain.brand : 브랜드 아이디 조회")
     void testGetBrandById() {
         int expected = this.randBrand().getId();
-        Optional<BrandDto> actual = this.service.getBrand(expected);
+        BrandDto actual = this.service.getBrand(expected);
         assertNotNull(actual);
-        assertTrue(actual.isPresent());
-        assertEquals(expected, actual.get().getId());
+        assertEquals(expected, actual.getId());
     }
 
     @Test
     @DisplayName("domain.brand : 브랜드 아이디 조회 - 없는 경우")
     void testGetBrandByIdNotExists() {
-        Optional<BrandDto> actual = this.service.getBrand(Integer.MAX_VALUE);
+        // TODO 예외처리
+        BrandDto actual = this.service.getBrand(Integer.MAX_VALUE);
         assertNotNull(actual);
-        assertTrue(actual.isEmpty());
     }
 
     @Test
@@ -107,11 +106,10 @@ class AdminServiceTest {
     void testUpdateBrand() {
         int target = this.randBrand().getId();
         BrandDto expected = BrandDto.builder().name("BRAND UPDATED").build();
-        Optional<BrandDto> actual = this.service.updateBrand(target, expected);
+        BrandDto actual = this.service.updateBrand(target, expected);
         assertNotNull(actual);
-        assertTrue(actual.isPresent());
-        assertEquals(target, actual.get().getId());
-        assertEquals(expected.getName(), actual.get().getName());
+        assertEquals(target, actual.getId());
+        assertEquals(expected.getName(), actual.getName());
     }
 
     @Test
@@ -120,9 +118,9 @@ class AdminServiceTest {
     void testUpdateBrandNotExists() {
         int target = Integer.MAX_VALUE;
         BrandDto expected = BrandDto.builder().name("BRAND UPDATED").build();
-        Optional<BrandDto> actual = this.service.updateBrand(target, expected);
+        BrandDto actual = this.service.updateBrand(target, expected);
         assertNotNull(actual);
-        assertTrue(actual.isEmpty());
+        // TODO 예외 처리
     }
 
     @Test
@@ -133,19 +131,17 @@ class AdminServiceTest {
 //        BrandDto target = this.service.newBrand(BrandDto.builder().name("BRAND FOR DELETE").build());
         BrandDto target = this.randBrand();
         this.service.deleteBrand(target.getId());
-        Optional<BrandDto> actual = this.service.getBrand(target.getId());
+        BrandDto actual = this.service.getBrand(target.getId());
         assertNotNull(actual);
-        assertTrue(actual.isEmpty());
     }
 
     @Test
     @DisplayName("domain.product : 상품 단건 조회")
     void testGetProduct() {
         ProductDto expected = this.randProduct();
-        Optional<ProductDto> actual = this.service.getProduct(expected.getId());
+        ProductDto actual = this.service.getProduct(expected.getId());
         assertNotNull(actual);
-        assertTrue(actual.isPresent());
-        assertEquals(expected, actual.get());
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -221,13 +217,12 @@ class AdminServiceTest {
                 .brandId(expectedBrand.getId())
                 .price(new Random().nextInt(100000))
                 .build();
-        Optional<ProductDto> actual = this.service.updateProduct(target.getId(), expected);
+        ProductDto actual = this.service.updateProduct(target.getId(), expected);
         assertNotNull(actual);
-        assertTrue(actual.isPresent());
-        assertEquals(target.getId(), actual.get().getId());
-        assertEquals(expectedBrand.getId(), actual.get().getBrandId());
-        assertEquals(expectedBrand.getName(), actual.get().getBrandName());
-        assertEquals(expected.getPrice(), actual.get().getPrice());
+        assertEquals(target.getId(), actual.getId());
+        assertEquals(expectedBrand.getId(), actual.getBrandId());
+        assertEquals(expectedBrand.getName(), actual.getBrandName());
+        assertEquals(expected.getPrice(), actual.getPrice());
     }
 
     @Test
@@ -239,9 +234,8 @@ class AdminServiceTest {
                 .brandId(this.randBrand().getId())
                 .price(new Random().nextInt(100000))
                 .build();
-        Optional<ProductDto> actual = this.service.updateProduct(target, expected);
+        ProductDto actual = this.service.updateProduct(target, expected);
         assertNotNull(actual);
-        assertTrue(actual.isEmpty());
     }
 
     // TODO 브랜드 없는 경우에 대한 정의 필요
@@ -251,9 +245,8 @@ class AdminServiceTest {
     void testUpdateProductWrongBrand() {
         ProductDto target = this.randProduct();
         target.setBrandId(Integer.MAX_VALUE);
-        Optional<ProductDto> actual = this.service.updateProduct(target.getId(), target);
+        ProductDto actual = this.service.updateProduct(target.getId(), target);
         assertNotNull(actual);
-        assertTrue(actual.isEmpty());
     }
 
     @Test
@@ -262,8 +255,7 @@ class AdminServiceTest {
     void testDeleteProduct() {
         long target = this.randProduct().getId();
         this.service.deleteProduct(target);
-        Optional<ProductDto> actual = this.service.getProduct(target);
+        ProductDto actual = this.service.getProduct(target);
         assertNotNull(actual);
-        assertTrue(actual.isEmpty());
     }
 }

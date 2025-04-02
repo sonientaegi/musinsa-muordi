@@ -1,5 +1,6 @@
 package com.musinsa.muordi.contents.explore.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -8,9 +9,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @EqualsAndHashCode
-@AllArgsConstructor
-public class PriceRecordDto {
-    protected int categoryId;
-    protected int brandId;
-    protected int price;
+public class ItemNamedDto extends ItemDto {
+    protected String categoryName;
+    protected String brandName;
 }

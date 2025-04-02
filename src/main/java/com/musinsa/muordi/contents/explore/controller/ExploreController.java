@@ -1,8 +1,8 @@
 package com.musinsa.muordi.contents.explore.controller;
 
-import com.musinsa.muordi.contents.explore.dto.CheapestBrandDto;
-import com.musinsa.muordi.contents.explore.dto.CheapestBrandOfCategoryDto;
-import com.musinsa.muordi.contents.explore.dto.PriceRangeOfCategoryDto;
+import com.musinsa.muordi.contents.explore.dto.BrandCheapestDto;
+import com.musinsa.muordi.contents.explore.dto.CategoryBrandCheapestDto;
+import com.musinsa.muordi.contents.explore.dto.CategoryPriceRangeDto;
 import com.musinsa.muordi.contents.explore.service.ExploreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,17 +17,17 @@ public class ExploreController {
     private final ExploreService exploreService;
 
     @GetMapping("/coordi/affordable")
-    public CheapestBrandOfCategoryDto getAffordableCoordi() {
+    public CategoryBrandCheapestDto getAffordableCoordi() {
         return this.exploreService.getCheapestByCategory();
     }
 
     @GetMapping("/coordi/affordable/brand")
-    public CheapestBrandDto getAffordableBrand() {
+    public BrandCheapestDto getAffordableBrand() {
         return this.exploreService.getCheapestBrand();
     }
 
     @GetMapping("/coordi/category/{name}/price/range")
-    public PriceRangeOfCategoryDto getCategoryPriceRange(@PathVariable String name) {
+    public CategoryPriceRangeDto getCategoryPriceRange(@PathVariable String name) {
         return this.exploreService.PriceRangeofCategoryByName(name);
     }
 }

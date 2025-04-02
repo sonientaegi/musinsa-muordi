@@ -1,5 +1,6 @@
 package com.musinsa.muordi.platform.admin.dto;
 
+import com.musinsa.muordi.platform.admin.repository.Product;
 import lombok.*;
 
 /**
@@ -30,6 +31,13 @@ public class ProductDto {
     private int brandId;
     private String brandName;
     private int price;
+
+    @Builder
+    public ProductDto(int brandId, String brandName, int price) {
+        this.brandId = brandId;
+        this.brandName = brandName;
+        this.price = price;
+    }
 
     @Override
     public ProductDto clone() {

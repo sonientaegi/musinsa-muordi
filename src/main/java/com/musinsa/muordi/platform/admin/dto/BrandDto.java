@@ -23,6 +23,11 @@ public class BrandDto {
     private Integer id;
     private String name;
 
+    @Builder
+    public BrandDto(String name) {
+        this.name = name;
+    }
+
     @Override
     public BrandDto clone() {
         return new BrandDto(this.id, this.name);

@@ -115,7 +115,7 @@ class ShowcaseRepositoryJpaWrapperTest {
         // 쇼케이스 생성을 위해 기존의 레코드를 하나 지운 뒤 다시 생성한다.
         Showcase target = this.randShowcase();
         int originId = target.getId();
-        this.repository.deleteByProductId(target.getId());
+        this.repository.delete(originId);
 
         // 동일 트랜잭션에서 삭제 후 동일 UK를 추가하면 JPA가 정합성 오류를 반환하므로 읽기를 한번 수행한다.
         this.repository.findAll();
@@ -123,7 +123,7 @@ class ShowcaseRepositoryJpaWrapperTest {
         Showcase expected = new Showcase();
         expected.setProduct(target.getProduct());
         expected.setCategory(target.getCategory());
-        Showcase actual = this.repository.save(expected);
+        Showcase actual = this.repository.create(expected);
         this.repository.findAll();
 
         assertNotNull(actual);
@@ -144,10 +144,9 @@ class ShowcaseRepositoryJpaWrapperTest {
             expectedCategory = this.randShowcase().getCategory();
         }
         target.setCategory(expectedCategory);
-        Optional<Showcase> actual = this.repository.updateByProductId(target.getProduct().getId(), target);
+        Showcase actual = this.repository.update(target);
         assertNotNull(actual);
-        assertTrue(actual.isPresent());
-        assertEquals(expectedCategory, actual.get().getCategory());
+        assertEquals(expectedCategory, actual.getCategory());
     }
 
     // 쇼케이스 중복 생성 실패. 하나의 상품을 여러 카테고리에 등록할 수 없다.
@@ -165,7 +164,7 @@ class ShowcaseRepositoryJpaWrapperTest {
         Showcase expected = this.randShowcase();
         expected.setCategory(targetCategory);
         expected.setProduct(target.getProduct());
-        Showcase actual = this.repository.save(expected);
+        Showcase actual = this.repository.create(expected);
 
         // JPA에 의해 읽기 수행 시 정합성 오류 발생.
         // 실서비스에서는 Transaction 종료 시 commit 중 예외 발생.
@@ -177,40 +176,8 @@ class ShowcaseRepositoryJpaWrapperTest {
     @Transactional
     void testDelete() {
         Showcase expected = this.randShowcase();
-        this.repository.deleteByProductId(expected.getId());
+        this.repository.delete(expected.getId());
         Optional<Showcase> actual = this.repository.findByProductId(expected.getProduct().getId());
         assertTrue(actual.isEmpty());
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

@@ -10,9 +10,9 @@ import java.util.List;
 @ToString
 @EqualsAndHashCode
 @AllArgsConstructor
-public class CheapestBrandDto {
+public class BrandCheapestDto {
     private int brandId;
     private String brandName;
     private int totalAmount;
-    List<PriceRecordWithNameDto> priceRecords;
+    List<ItemNamedDto> priceRecords;
 }
