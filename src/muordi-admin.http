@@ -14,22 +14,28 @@ Content-Type: application/json
   "name": "소니언스튜디오"
 }
 
+### 브랜드 삭제
+DELETE http://{{host}}/api/admin/v1/brand/10
+
+### 브랜드 삭제 - 중복
+DELETE http://{{host}}/api/admin/v1/brand/10
+
+### 브랜드 삭제 - 삭제 불가
+DELETE http://{{host}}/api/admin/v1/brand/1
+
 ### 브랜드 전체 조회
 GET http://{{host}}/api/admin/v1/brand
 
 ### 특정 브랜드 조회
 GET http://{{host}}/api/admin/v1/brand/2
 
-### 브랜드 삭제
-DELETE http://{{host}}/api/admin/v1/brand/2
-
 ### 상품 조회
 GET http://{{host}}/api/admin/v1/product
 
-### 상품 식별자 조회
+### 상품 ID 조회
 GET http://{{host}}/api/admin/v1/product/44
 
-### 브랜드 식별자로 상품 조회
+### 브랜드 ID로 상품 조회
 GET http://{{host}}/api/admin/v1/product/brand/5
 
 ### 브랜드 이름으로 상품 조회
@@ -56,5 +62,8 @@ Content-Type: application/json
 ### 상품 삭제
 DELETE http://{{host}}/api/admin/v1/product/73
 
+### 상품 삭제 - 중복
+DELETE http://{{host}}/api/admin/v1/product/73
+
 ### 상품 삭제 - 불가
-DELETE http://{{host}}/api/admin/v1/product/44
+DELETE http://{{host}}/api/admin/v1/product/1

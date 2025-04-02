@@ -2,6 +2,9 @@ package com.musinsa.muordi.contents.explore.dto;
 
 import lombok.*;
 
+/**
+ * 최고가, 최저가 DTO.
+ */
 @Setter
 @Getter
 @Builder
@@ -9,9 +12,9 @@ import lombok.*;
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
-public class PriceRangeOfCategoryDto {
+public class CategoryPriceRangeDto {
     private int categoryId;
     private String categoryName;
-    private PriceRecordWithNameDto maxPriceRecord;
-    private PriceRecordWithNameDto minPriceRecord;
+    private ItemNamedDto maxPriceRecord;
+    private ItemNamedDto minPriceRecord;
 }

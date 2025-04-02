@@ -1,15 +1,12 @@
 package com.musinsa.muordi.contents.display.dto;
 
-import com.musinsa.muordi.contents.display.repository.Category;
 import lombok.*;
-
-import java.util.List;
 
 /**
  * 카테고리 DTO는 다음의 정보를 제공한다.
  * <ul>
  *     <li>
- *         id : 카테고리 식별자.
+ *         id : 카테고리 ID.
  *     </li>
  *     <li>
  *         name : 카테고리 이름.
@@ -21,37 +18,15 @@ import java.util.List;
  * 카테고리는 읽기 전용이다.
  */
 @Getter
+@Setter
 @ToString
 @EqualsAndHashCode
 @NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@AllArgsConstructor
 public class CategoryDto {
     private Integer id;
     private String name;
     private int displaySequence;
-
-    /**
-     * 카테고리 entity를 받아 DTO로 변환한다. 카테고리 DTO는 읽기 전용이다.
-     * @param category 카테고리 entity.
-     * @return 카테고리 DTO.
-     */
-    public static CategoryDto fromEntity(Category category) {
-        CategoryDto dto = new CategoryDto();
-        dto.id = category.getId();
-        dto.name = category.getName();
-        dto.displaySequence = category.getDisplaySequence();
-
-        return dto;
-    }
-
-    /**
-     * 카테고리 entity 리스트를 받아 DTO 리스트로 순서를 유지하여 변환한다. 카테고리 DTO와 리스트는 읽기 전용이다.
-     * @param categories 카테고리 entity 리스트.
-     * @return 카테고리 DTO 리스트.
-     */
-    public static List<CategoryDto> fromEntities(List<Category> categories) {
-        return categories.stream().map(CategoryDto::fromEntity).toList();
-    }
 
     @Override
     protected Object clone() {

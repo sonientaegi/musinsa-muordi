@@ -1,5 +1,6 @@
 package com.musinsa.muordi.platform.admin.repository;
 
+import com.musinsa.muordi.common.exception.RepositoryEntityNotExistException;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,42 +14,50 @@ import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ActiveProfiles("test-admin-product")
+/*
+PRODUCT 의 JpaRepository 테스트
+ */
+@ActiveProfiles("test-empty")
 @SpringBootTest
-public class ProductRepositoryTest {
+public class ProductRepositoryJpaWrapperTest {
     /*
     주의.
     JPA에서 FK 참조를 할때 EAGER 모드로 설정해도 Test 환경에서는 LAZY로 동작한다. 반드시 Transaction 설정하고 TC 구현할것.
      */
-
-    /**
-     * DTO 테스트를 지원하기위해 제공하는 샘플 데이터 입니다.
-     * @return
-     */
-    public static Product sample() {
-        return new Product(1l, BrandRepositoryTest.sample(), 50000);
-    }
-
     @Autowired
     private BrandRepository brandRepository;
 
     @Autowired
-    private ProductRepository repository;
+    private ProductRepositoryJpaWrapper repository;
 
     // 테스트케이스
     private Map<Long, Product> testCases = new HashMap<>();
 
     @BeforeEach
     void setUp() {
+        // 테스트 케이스 생성.
+        List.of(
+                new Brand(null, "BRAND 3", null),
+                new Brand(null, "BRAND 4", null),
+                new Brand(null, "BRAND 2", null),
+                new Brand(null, "BRAND 1", null),
+                new Brand(null, "BRAND 4", null)
+        ).forEach(brand -> {
+            this.brandRepository.create(brand);
+        });
+
         // 각 브랜드별로 두개씩 상품을 생성해준다.
         Random rand = new Random();
         this.brandRepository.findAll().forEach(brand -> {
             IntStream.range(0, 2).forEach(i -> {
-                Product product = Product.builder()
-                        .brand(brand)
-                        .price(rand.nextInt(1000, 100000))
-                        .build();
-                Product testCase = this.repository.save(product);
+                Product product = new Product();
+                product.setBrand(brand);
+                product.setPrice(rand.nextInt(1000, 100000));
+//                Product product = Product.builder()
+//                        .brand(brand)
+//                        .price(rand.nextInt(1000, 100000))
+//                        .build();
+                Product testCase = this.repository.create(product);
                 this.testCases.put(testCase.getId(), testCase);
             });
         });
@@ -63,7 +72,6 @@ public class ProductRepositoryTest {
         return products.get(new Random().nextInt(products.size())).clone();
     }
 
-    // 상품 전체 조회.
     @Test
     @DisplayName("상품 전체 조회")
     @Transactional
@@ -75,9 +83,8 @@ public class ProductRepositoryTest {
         });
     }
 
-    // 상품 아이디로 단건 조회.
     @Test
-    @DisplayName("상품 단건 조회")
+    @DisplayName("상품 ID 조회")
     @Transactional
     void testFindById() {
         Product expected = this.randProduct();
@@ -86,7 +93,6 @@ public class ProductRepositoryTest {
         assertEquals(expected, actual);
     }
 
-    // 무작위로 고른 브랜드명을 가지는 모든 상품을 조회.
     @Test
     @DisplayName("브랜드 이름으로 상품 조회")
     @Transactional
@@ -106,43 +112,44 @@ public class ProductRepositoryTest {
         assertEquals(expecteds, actuals);
     }
 
-    // 무작위로 고른 브랜드 식별자를을 가지는 모든 상품을 조회.
     @Test
-    @DisplayName("브랜드 식별자로 상품 조회")
+    @DisplayName("브랜드 ID로 상품 조회")
     @Transactional
     void testFndByBrandId() {
         int brandId = this.randProduct().getBrand().getId();
 
-        // 전체 테스트케이스에서 브랜드 식별자가 일치하는 대상을 추린다.
+        // 전체 테스트케이스에서 브랜드 ID가 일치하는 대상을 추린다.
         List<Product> expecteds = this.testCases.values().stream()
                 .filter(p -> p.getBrand().getId().equals(brandId))
                 .sorted(Comparator.comparingLong(Product::getId))
                 .toList();
 
-        // 브랜드 식별자 조회 검증.
+        // 브랜드 ID 조회 검증.
         List<Product> actuals = this.repository.findByBrandId(brandId);
         assertNotNull(actuals);
         actuals.sort(Comparator.comparingLong(Product::getId));
         assertEquals(expecteds, actuals);
     }
 
-    // 상품 생성.
     @Test
     @DisplayName("상품 생성")
     @Transactional
     void testSave() {
-        Product expected = Product.builder()
-                .brand(this.randProduct().getBrand())
-                .price(new Random().nextInt(1000, 100000))
-                .build();
-        Product actual = this.repository.save(expected);
+//        Product expected = Product.builder()
+//                .brand(this.randProduct().getBrand())
+//                .price(new Random().nextInt(1000, 100000))
+//                .build();
+        Product expected = this.randProduct();
+        expected.setBrand(this.randProduct().getBrand());
+        expected.setPrice(new Random().nextInt(1000, 100000));
+
+        Product actual = this.repository.create(expected);
         assertNotNull(actual);
         assertNotNull(actual.getId());
         assertNotNull(actual.getBrand());
         assertEquals(expected.getPrice(), actual.getPrice());
     }
 
-    // 상품 수정.
     @Test
     @DisplayName("상품 수정")
     @Transactional
@@ -154,43 +161,37 @@ public class ProductRepositoryTest {
         }
 
         // 브랜드와 금액을 동시에 변경한다.
-        Product expected = Product.builder()
-                .brand(expectedBrand)
-                .price(new Random().nextInt(1000, 100000))
-                .build();
-        Product actual = this.repository.updateById(testCase.getId(), expected).orElse(null);
+//        Product expected = Product.builder()
+//                .brand(expectedBrand)
+//                .price(new Random().nextInt(1000, 100000))
+//                .build();
+        Product expected = new Product();
+        expected.setBrand(expectedBrand);
+        expected.setPrice(new Random().nextInt(1000, 100000));
+
+        Product actual = this.repository.update(testCase.getId(), expected);
         assertNotNull(actual);
         assertEquals(expected.getBrand(), actual.getBrand());
         assertEquals(expected.getPrice(), actual.getPrice());
     }
 
-    // 상품 삭제
     @Test
     @DisplayName("상품 삭제")
     @Transactional
     void testDelete() {
         Product testCase = this.randProduct();
-        this.repository.deleteById(testCase.getId());
+        this.repository.delete(testCase.getId());
         Product actual = this.repository.findById(testCase.getId()).orElse(null);
         assertNull(actual);
     }
 
-    // 존재하지 않는 상품 수정
-    // 예외 발생 : ObjectOptimisticLockingFailureException
     @Test
-    @DisplayName("예외 발생 : 존재하지 않는 상품 수정")
+    @DisplayName("상품 수정 : 존재하지 않는 상품")
     @Transactional
     void testUpdateNotExists() {
         Product expected = this.randProduct();
         expected.setPrice(Integer.MAX_VALUE);
 
-        // TODO 존재하지 않는 상품 수정 시 exception / null 어떻게 처리할지 고민.
-        // 예외 발생 : ObjectOptimisticLockingFailureException
-        Optional<Product> actual = this.repository.updateById(Integer.MIN_VALUE, expected);
+        assertThrows(RepositoryEntityNotExistException.class, () -> this.repository.update(Integer.MIN_VALUE, expected));
     }
-
-
-//    @AfterEach
-//    void tearDown() {
-//    }
 }

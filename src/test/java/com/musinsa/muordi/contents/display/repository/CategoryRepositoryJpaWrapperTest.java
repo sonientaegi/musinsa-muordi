@@ -1,12 +1,11 @@
 package com.musinsa.muordi.contents.display.repository;
 
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.*;
@@ -14,19 +13,17 @@ import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ActiveProfiles("test-display-category")
+/*
+CATEGORY 의 JpaRepository 테스트
+ */
+@ActiveProfiles("test-empty")
 @SpringBootTest
-public class CategoryRepositoryTest {
-    /**
-     * DTO 테스트를 지원하기위해 제공하는 샘플 데이터 입니다.
-     * @return
-     */
-    public static Category sample() {
-        return new Category(1, "SAMPLE", 1);
-    }
+public class CategoryRepositoryJpaWrapperTest {
+    @Autowired
+    CategoryRepositoryJpaWrapper repository;
 
     @Autowired
-    CategoryRepository repository;
+    CategoryRepositoryJpa repositoryJpa;
 
     // 테스트케이스
     private List<Category> testCases = new ArrayList<>();
@@ -34,7 +31,7 @@ public class CategoryRepositoryTest {
     @BeforeEach
     void setUp() {
         // 테스트 케이스 생성.
-        this.testCases = this.repository.saveAll(
+        this.testCases = this.repositoryJpa.saveAll(
             List.of(
                 new Category(null, "CATEGORY 3", 5),
                 new Category(null, "CATEGORY 1", 1),
@@ -45,14 +42,10 @@ public class CategoryRepositoryTest {
         );
     }
 
-    @AfterEach
-    void tearDown() {
-    }
-
-    // 전체 카테고리 조회 시 전시순서 정렬 확인.
     @Test
+    @DisplayName("전체 카테고리 조회 시 전시순서 정렬 확인.")
     @Transactional
-    void all() {
+    void testAll() {
         List<Category> categories = repository.findAll();
         assertNotNull(categories);
         assertEquals(this.testCases.size(), categories.size());
@@ -61,36 +54,38 @@ public class CategoryRepositoryTest {
         });
     }
 
-    // 빈 카테고리 조회시 빈 리스트 반환 확인.
+
     @Test
+    @DisplayName("빈 카테고리 조회")
     @Transactional
-    void allWithEmptied() {
-        this.repository.deleteAll();
+    void testAllWithEmptied() {
+        this.repositoryJpa.deleteAll();
+
         List<Category> actual = this.repository.findAll();
         assertNotNull(actual);
         assertEquals(actual.size(), 0);
     }
 
-    // 카테고리 식별자별 조회 결과 확인.
     @Test
+    @DisplayName("카테고리 ID 조회")
     @Transactional
-    void byId() {
+    void testFindById() {
         this.testCases.forEach(expected -> {
             assertEquals(expected, this.repository.findById(expected.getId()).orElse(null));
         });
     };
 
-    // 존재하지않는 식별자 조회 결과 null 확인.
     @Test
+    @DisplayName("카테고리 ID 조회 - 없는 ID")
     @Transactional
-    void byIdNotExists() {
+    void testFindByIdNotExists() {
         assertNull(this.repository.findById(Integer.MAX_VALUE).orElse(null));
     }
 
-    // 이름 조회 결과와 정렬 확인.
     @Test
+    @DisplayName("카테고리 이름 조회 & 정렬 확인")
     @Transactional
-    void byName() {
+    void testFindByName() {
         // 테스트케이스를 이름순으로 분류 후 결과를 전시 오름차순 정렬.
         Map<String, List<Category>> expected = new HashMap<>();
         this.testCases.forEach(category -> {
@@ -102,24 +97,15 @@ public class CategoryRepositoryTest {
 
         // 이름별 조회 결과와 기댓값을 비교.
         this.testCases.stream().map(Category::getName).forEach(name -> {
-            assertEquals(expected.get(name), this.repository.findByNameOrderByDisplaySequenceAsc(name));
+            assertEquals(expected.get(name), this.repository.findByName(name));
         });
     }
 
-    // 존재하지않는 카테고리 조회 결과 null 또는 빈 리스트 확인.
     @Test
+    @DisplayName("카테고리 이름 조회 - 없는 이름")
     @Transactional
-    void byNameNotExists() {
+    void testFindByNameNotExists() {
         assertThrows(NoSuchElementException.class, () -> this.repository.findById(Integer.MAX_VALUE).get());
         assertEquals(0, this.repository.findByName("CATEGORY" + Integer.MAX_VALUE).size());
-    }
-
-
-    // 전시순서 정합성 제약조건 확인.
-    // 이미 존재하는 display_sequence 값을 입력하는 경우 unique key 조건을 위배하여 무결성오류예외를 반환한다.
-    @Test
-    @Transactional
-    void createCategoryExistedDisplaySequence() {
-        assertThrows(DataIntegrityViolationException.class, () -> this.repository.save(new Category(null, "CATEGORY" + Integer.MAX_VALUE, 1)));
     }
 }

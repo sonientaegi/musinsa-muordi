@@ -10,9 +10,9 @@ import java.io.Serializable;
 /**
  * PRODUCT entity를 정의한다.
  * <ul>
- *     <li>Long {@link Product#id}(PK) 상품 식별자</li>
- *     <li>BRAND {@link Product#brand}(FK) 브랜드 식별자</li>
- *     <li>Integer price</li>
+ *     <li>Long {@link Product#id}(PK) 상품 ID</li>
+ *     <li>BRAND {@link Product#brand}(FK) 브랜드 ID</li>
+ *     <li>int price 상품 가격</li>
  * </ul>
  * 인덱스 정보
  * <ul>
@@ -21,32 +21,28 @@ import java.io.Serializable;
  * PRODUCT는 상품을 판매하는 브랜드와 가격정보를 갖는다. 등록한 상품의 가격과 브랜드는 수정이 가능하다.
  */
 @Getter
-@Setter(AccessLevel.PACKAGE)
+@Setter
 @ToString
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @Entity
 @Table(name = "product", indexes = {
+        // 브랜드 ID 조회.
         @Index(name = "product_idx_brand", columnList = "brand_id"),
 })
 public class Product implements Serializable, EntityUpdate<Product> {
     @Id
-    @Setter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.PACKAGE)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 상품이 참조하는 브랜드 정보는 항상 함께 다룬다.
     @JsonIgnore
     @JoinColumn(name="brand_id", nullable = false, updatable = true)
     @ManyToOne(fetch = FetchType.EAGER)
     private Brand brand;
     private int price;
-
-    @Builder
-    public Product(Brand brand, int price) {
-        this.brand = brand;
-        this.price = price;
-    }
 
     @Override
     public void updateFrom(Product src) {

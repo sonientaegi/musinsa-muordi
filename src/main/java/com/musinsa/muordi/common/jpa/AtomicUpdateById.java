@@ -1,5 +1,6 @@
 package com.musinsa.muordi.common.jpa;
 
+import com.musinsa.muordi.common.exception.RepositoryEntityNotExistException;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceException;
 import org.hibernate.PessimisticLockException;
@@ -61,13 +62,10 @@ public interface AtomicUpdateById<T extends EntityUpdate, K> extends JpaReposito
      * @throws LockTimeoutException 락 획득 도중 타임아웃 발생.
      * @throws PersistenceException
      */
-    default Optional<T> updateById(K id, T source) {
-        T target = this.findByIdWithLock(id).orElse(null);
-        if (target == null) {
-            return Optional.empty();
-        }
+    default T updateById(K id, T source) {
+        // TODO Generic의 타입 T를 구하는 기능 구현 필요.
+        T target = this.findByIdWithLock(id).orElseThrow(() -> new RepositoryEntityNotExistException("T", id));
         target.updateFrom(source);
-        T updated = this.save(target);
-        return Optional.of(updated);
+        return this.save(target);
     }
 }

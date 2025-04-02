@@ -1,41 +1,33 @@
 package com.musinsa.muordi.contents.display.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.List;
+import java.util.Optional;
+
 
 /**
- * 카테고리 DML을 정의한다. 모든 결과는 공통적으로 display_sequence 오름차순으로 정렬한다.
+ * 카테고리 repository 의 DML을 명세한 인터페이스이다.
+ * 모든 결과는 공통적으로 전시 순서(display_sequence) 오름차순으로 정렬한다.
  */
-public interface CategoryRepository extends JpaRepository<Category, Integer> {
+public interface CategoryRepository {
     /**
-     * {@link CategoryRepository#findAll()}의 원형이다.
+     * 모든 카테고리를 전시 순서 오름차순으로 반환한다.
+     * @return 오름차순으로 정렬한 모든 카테고리 entity 리스트.
+     * @see CategoryRepositoryJpa#findAllByOrderByDisplaySequenceAsc()
      */
-    List<Category> findAllByOrderByDisplaySequenceAsc();
+    List<Category> findAll();
 
     /**
-     * 모든 결과를 display_sequence 오름차순으로 정렬하여 반환한다.
-     * @return 발견시 모든 카테고리 리스트, 또는 빈 리스트.
-     * @see CategoryRepository#findAllByOrderByDisplaySequenceAsc()
+     * 이름으로 카테고리를 조회한다.
+     * @param name 카테고리 이름. 같은 이름을 가진 카테고리가 여러개있으면 모두 반환한다.
+     * @return 카테고리 entity 리스트.
      */
-    default List<Category> findAll() {
-        return this.findAllByOrderByDisplaySequenceAsc();
-    }
+    List<Category> findByName(String name);
 
     /**
-     * {@link CategoryRepository#findByName(String)}의 원형이다.
-     * @param name
-     * @return
+     * ID로 카테고리를 조회한다. ID는 카테고리의 유일한 식별자이며 두 개 이상의 같은 값은 존재하지 않는다.
+     * @param id 카테고리 ID
+     * @return Optional로 감싼 카테고리 entity, 미발견 시 빈 Optional을 반환한다. null 일 수 없다.
      */
-    List<Category> findByNameOrderByDisplaySequenceAsc(String name);
+    Optional<Category> findById(int id);
 
-    /**
-     * 모든 결과를 display_sequence 오름차순으로 정렬하여 반환한다.
-     * @param name 카테고리 이름
-     * @return 발견 시 카테고리 리스트, 또는 빈 리스트
-     * @see CategoryRepository#findByNameOrderByDisplaySequenceAsc(String)
-     */
-    default List<Category>findByName(String name){
-        return this.findByNameOrderByDisplaySequenceAsc(name);
-    }
 }

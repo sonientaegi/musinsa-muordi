@@ -1,8 +1,6 @@
 package com.musinsa.muordi.contents.explore.controller;
 
-import com.musinsa.muordi.contents.explore.dto.CheapestBrandDto;
-import com.musinsa.muordi.contents.explore.dto.CheapestBrandOfCategoryDto;
-import com.musinsa.muordi.contents.explore.dto.PriceRangeOfCategoryDto;
+import com.musinsa.muordi.contents.explore.dto.*;
 import com.musinsa.muordi.contents.explore.service.ExploreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +8,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * 탐색 도메인 컨트롤러.
+ */
 @RequestMapping("/api/explore/v1")
 @RequiredArgsConstructor
 @RestController
@@ -17,17 +18,20 @@ public class ExploreController {
     private final ExploreService exploreService;
 
     @GetMapping("/coordi/affordable")
-    public CheapestBrandOfCategoryDto getAffordableCoordi() {
-        return this.exploreService.getCheapestByCategory();
+    public CategoryBrandCheapestResponse getAffordableCoordi() {
+        CategoryBrandCheapestDto dto = this.exploreService.getCheapestByCategory();
+        return CategoryBrandCheapestResponse.fromDto(dto);
     }
 
     @GetMapping("/coordi/affordable/brand")
-    public CheapestBrandDto getAffordableBrand() {
-        return this.exploreService.getCheapestBrand();
+    public BrandCheapestResponse getAffordableBrand() {
+        BrandCheapestDto dto = this.exploreService.getCheapestBrand();
+        return BrandCheapestResponse.fromDto(dto);
     }
 
     @GetMapping("/coordi/category/{name}/price/range")
-    public PriceRangeOfCategoryDto getCategoryPriceRange(@PathVariable String name) {
-        return this.exploreService.PriceRangeofCategoryByName(name);
+    public CategoryPriceRangeResponse getCategoryPriceRange(@PathVariable String name) {
+        CategoryPriceRangeDto dto = this.exploreService.PriceRangeofCategoryByName(name);
+        return CategoryPriceRangeResponse.fromDto(dto);
     }
 }
