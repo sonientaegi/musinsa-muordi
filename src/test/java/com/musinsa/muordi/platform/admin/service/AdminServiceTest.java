@@ -1,5 +1,6 @@
 package com.musinsa.muordi.platform.admin.service;
 
+import com.musinsa.muordi.common.exception.ResourceNotFoundException;
 import com.musinsa.muordi.platform.admin.dto.BrandDto;
 import com.musinsa.muordi.platform.admin.dto.ProductDto;
 import jakarta.transaction.Transactional;
@@ -21,12 +22,6 @@ class AdminServiceTest {
     @Autowired
     private AdminService service;
 
-//    // 검증을 위해 카테고리 하나를 무작위로 가지고 온다.
-//    private CategoryDto randCategory() {
-//        List<CategoryDto> categories = this.service.getCategories();
-//        return categories.get(new Random().nextInt(categories.size()));
-//    }
-
     // 검증을 위해 브랜드 하나를 무작위로 가지고 온다.
     private BrandDto randBrand() {
         List<BrandDto> brands = this.service.getBrands();
@@ -38,17 +33,9 @@ class AdminServiceTest {
         List<ProductDto> products = this.service.getProducts();
         return products.get(new Random().nextInt(products.size()));
     }
-//
-//    @Test
-//    @DisplayName("domain.category : 카테고리 조회")
-//    void testGetCategories() {
-//        List<CategoryDto> actuals = this.service.getCategories();
-//        assertNotNull(actuals);
-//        assertTrue(actuals.size() > 0);
-//    }
 
     @Test
-    @DisplayName("domain.brand : 브랜드 전체 조회")
+    @DisplayName("브랜드 전체 조회")
     void testGetBrands() {
         List<BrandDto> actuals = this.service.getBrands();
         assertNotNull(actuals);
@@ -56,7 +43,7 @@ class AdminServiceTest {
     }
 
     @Test
-    @DisplayName("domain.brand : 브랜드 명칭 조회")
+    @DisplayName("브랜드 이름 조회")
     void testGetBrandsByName() {
         String expected = this.randBrand().getName();
         List<BrandDto> actuals = this.service.getBrands(expected);
@@ -66,7 +53,7 @@ class AdminServiceTest {
     }
 
     @Test
-    @DisplayName("domain.brand : 브랜드 이름 조회 - 없는 경우")
+    @DisplayName("브랜드 이름 조회 - 없는 이름")
     void testGetBrandsByNameNotExists() {
         List<BrandDto> actuals = this.service.getBrands("BRAND NEVER EXISTS!");
         assertNotNull(actuals);
@@ -74,7 +61,7 @@ class AdminServiceTest {
     }
 
     @Test
-    @DisplayName("domain.brand : 브랜드 아이디 조회")
+    @DisplayName("브랜드 ID 조회")
     void testGetBrandById() {
         int expected = this.randBrand().getId();
         BrandDto actual = this.service.getBrand(expected);
@@ -83,18 +70,16 @@ class AdminServiceTest {
     }
 
     @Test
-    @DisplayName("domain.brand : 브랜드 아이디 조회 - 없는 경우")
+    @DisplayName("브랜드 ID 조회 - 없는 ID")
     void testGetBrandByIdNotExists() {
-        // TODO 예외처리
-        BrandDto actual = this.service.getBrand(Integer.MAX_VALUE);
-        assertNotNull(actual);
+        assertThrows(ResourceNotFoundException.class, () -> this.service.getBrand(Integer.MAX_VALUE));
     }
 
     @Test
     @Transactional
-    @DisplayName("domain.brand : 신규브랜드 생성")
+    @DisplayName("브랜드 생성")
     void testCreateBrand() {
-        BrandDto expected = BrandDto.builder().name("BRAND NEW").build();
+        BrandDto expected = new BrandDto(null, "BRAND NEW");
         BrandDto actual = this.service.createBrand(expected);
         assertNotNull(actual);
         assertEquals(expected.getName(), actual.getName());
@@ -102,10 +87,10 @@ class AdminServiceTest {
 
     @Test
     @Transactional
-    @DisplayName("domain.brand : 기존 브랜드 수정")
+    @DisplayName("브랜드 수정")
     void testUpdateBrand() {
         int target = this.randBrand().getId();
-        BrandDto expected = BrandDto.builder().name("BRAND UPDATED").build();
+        BrandDto expected = new BrandDto(null, "BRAND UPDATED");
         BrandDto actual = this.service.updateBrand(target, expected);
         assertNotNull(actual);
         assertEquals(target, actual.getId());
@@ -114,29 +99,24 @@ class AdminServiceTest {
 
     @Test
     @Transactional
-    @DisplayName("domain.brand : 기존 브랜드 수정 - 없는 경우")
+    @DisplayName("브랜드 수정 - 없는 ID")
     void testUpdateBrandNotExists() {
         int target = Integer.MAX_VALUE;
-        BrandDto expected = BrandDto.builder().name("BRAND UPDATED").build();
-        BrandDto actual = this.service.updateBrand(target, expected);
-        assertNotNull(actual);
-        // TODO 예외 처리
+        BrandDto expected = new BrandDto(null, "BRAND UPDATED");
+        assertThrows(ResourceNotFoundException.class, () -> this.service.updateBrand(target, expected));
     }
 
     @Test
     @Transactional
-    @DisplayName("domain.brand : 브랜드 삭제")
+    @DisplayName("브랜드 삭제")
     void testDeleteBrand() {
-//        // 삭제 테스트는 신규 생성 후 수행.
-//        BrandDto target = this.service.newBrand(BrandDto.builder().name("BRAND FOR DELETE").build());
         BrandDto target = this.randBrand();
         this.service.deleteBrand(target.getId());
-        BrandDto actual = this.service.getBrand(target.getId());
-        assertNotNull(actual);
+        assertThrows(ResourceNotFoundException.class, () -> this.service.getBrand(target.getId()));
     }
 
     @Test
-    @DisplayName("domain.product : 상품 단건 조회")
+    @DisplayName("상품 ID 조회")
     void testGetProduct() {
         ProductDto expected = this.randProduct();
         ProductDto actual = this.service.getProduct(expected.getId());
@@ -145,7 +125,7 @@ class AdminServiceTest {
     }
 
     @Test
-    @DisplayName("domain.product : 상품 전체 조회")
+    @DisplayName("상품 전체 조회")
     void testGetProducts() {
         List<ProductDto> actuals = this.service.getProducts();
         assertNotNull(actuals);
@@ -153,7 +133,7 @@ class AdminServiceTest {
     }
 
     @Test
-    @DisplayName("domain.product : 브랜드 명칭으로 상품 조회")
+    @DisplayName("브랜드 이름으로 상품 조회")
     void testGetProductsByBrandName() {
         String expected = this.randBrand().getName();
         List<ProductDto> actuals = this.service.getProductsByBrandName(expected);
@@ -163,7 +143,7 @@ class AdminServiceTest {
     }
 
     @Test
-    @DisplayName("domain.product : 브랜드 명칭으로 상품 조회 - 없는 경우")
+    @DisplayName("브랜드 이름으로 상품 조회 - 없는 경우")
     void testGetProductsByBrandNameNotExist() {
         List<ProductDto> actuals = this.service.getProductsByBrandName("BRAND NEVER EXISTS!");
         assertNotNull(actuals);
@@ -171,7 +151,7 @@ class AdminServiceTest {
     }
 
     @Test
-    @DisplayName("domain.product : 브랜드 식별자로 상품 조회")
+    @DisplayName("브랜드 ID로 상품 조회")
     void testGetProductsByBrandId() {
         int expected = this.randBrand().getId();
         List<ProductDto> actuals = this.service.getProductsByBrandId(expected);
@@ -181,7 +161,7 @@ class AdminServiceTest {
     }
 
     @Test
-    @DisplayName("domain.product : 브랜드 식별자로 상품 조회 - 없는 경우")
+    @DisplayName("브랜드 ID로 상품 조회 - 없는 경우")
     void testGetProductsByBrandIdNotExist() {
         List<ProductDto> actuals = this.service.getProductsByBrandId(Integer.MAX_VALUE);
         assertNotNull(actuals);
@@ -190,13 +170,13 @@ class AdminServiceTest {
 
     @Test
     @Transactional
-    @DisplayName("domain.product : 신규 상품 생성")
+    @DisplayName(" 상품 생성")
     void testCreateProduct() {
         BrandDto expectedBrand = this.randBrand();
-        ProductDto expected = ProductDto.builder()
-                .brandId(expectedBrand.getId())
-                .price(new Random().nextInt(100000))
-                .build();
+        ProductDto expected = new ProductDto();
+        expected.setBrandId(expectedBrand.getId());
+        expected.setPrice(new Random().nextInt(100000));
+
         ProductDto actual = this.service.createProduct(expected);
         assertNotNull(actual);
         assertEquals(expected.getBrandId(), actual.getBrandId());
@@ -206,17 +186,18 @@ class AdminServiceTest {
 
     @Test
     @Transactional
-    @DisplayName("domain.product : 기존 상품 수정")
+    @DisplayName("상품 수정")
     void testUpdateProduct() {
+        // 무작위로 상품을 가져온 다음 무작위로 브랜드를 변경한다.
         ProductDto target = this.randProduct();
         BrandDto expectedBrand = this.randBrand();
         while (expectedBrand.getId() == target.getBrandId()) {
             expectedBrand = this.randBrand();
         }
-        ProductDto expected = ProductDto.builder()
-                .brandId(expectedBrand.getId())
-                .price(new Random().nextInt(100000))
-                .build();
+        ProductDto expected = new ProductDto();
+        expected.setBrandId(expectedBrand.getId());
+        expected.setPrice(new Random().nextInt(100000));
+
         ProductDto actual = this.service.updateProduct(target.getId(), expected);
         assertNotNull(actual);
         assertEquals(target.getId(), actual.getId());
@@ -227,35 +208,31 @@ class AdminServiceTest {
 
     @Test
     @Transactional
-    @DisplayName("domain.product : 기존 상품 수정 - 없는 경우")
+    @DisplayName("상품 수정 - 없는 ID")
     void testUpdateProductNotExists() {
         long target = Long.MAX_VALUE;
-        ProductDto expected = ProductDto.builder()
-                .brandId(this.randBrand().getId())
-                .price(new Random().nextInt(100000))
-                .build();
-        ProductDto actual = this.service.updateProduct(target, expected);
-        assertNotNull(actual);
+        ProductDto expected = new ProductDto();
+        expected.setBrandId(this.randBrand().getId());
+        expected.setPrice(new Random().nextInt(100000));
+
+        assertThrows(ResourceNotFoundException.class, () -> this.service.updateProduct(target, expected));
     }
 
-    // TODO 브랜드 없는 경우에 대한 정의 필요
     @Test
     @Transactional
-    @DisplayName("domain.product : 기존 상품 수정 - 브랜드가 없는 경우")
+    @DisplayName("상품 수정 - 브랜드가 없는 경우")
     void testUpdateProductWrongBrand() {
         ProductDto target = this.randProduct();
         target.setBrandId(Integer.MAX_VALUE);
-        ProductDto actual = this.service.updateProduct(target.getId(), target);
-        assertNotNull(actual);
+        assertThrows(ResourceNotFoundException.class, () -> this.service.updateProduct(target.getId(), target));
     }
 
     @Test
     @Transactional
-    @DisplayName("domain.product : 상품 삭제")
+    @DisplayName("상품 삭제")
     void testDeleteProduct() {
         long target = this.randProduct().getId();
         this.service.deleteProduct(target);
-        ProductDto actual = this.service.getProduct(target);
-        assertNotNull(actual);
+        assertThrows(ResourceNotFoundException.class, ()-> this.service.getProduct(target));
     }
 }

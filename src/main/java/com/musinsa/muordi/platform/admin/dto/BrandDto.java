@@ -17,16 +17,10 @@ import lombok.*;
 @Setter
 @ToString
 @EqualsAndHashCode
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@AllArgsConstructor
 public class BrandDto {
     private Integer id;
     private String name;
-
-    @Builder
-    public BrandDto(String name) {
-        this.name = name;
-    }
 
     @Override
     public BrandDto clone() {

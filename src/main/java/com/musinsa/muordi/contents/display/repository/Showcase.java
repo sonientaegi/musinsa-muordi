@@ -22,7 +22,7 @@ import java.io.Serializable;
  * UniqueKey 인 상품 ID가 쇼케이스의 실질적인 PK 역할을 한다. 하나의 상품은 오직 하나의 전시 카테고리에만 등록할 수 있다.
  */
 @Getter
-@Setter(AccessLevel.PACKAGE)
+@Setter
 @ToString
 @EqualsAndHashCode
 @NoArgsConstructor
@@ -49,11 +49,11 @@ public class Showcase implements Serializable, EntityUpdate<Showcase> {
     @ManyToOne(fetch = FetchType.EAGER)
     Category category;
 
-    @Builder
-    public Showcase(Product product, Category category) {
-        this.product = product;
-        this.category = category;
-    }
+//    @Builder
+//    public Showcase(Product product, Category category) {
+//        this.product = product;
+//        this.category = category;
+//    }
 
     @Override
     public void updateFrom(Showcase src) {

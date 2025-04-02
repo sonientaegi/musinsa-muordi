@@ -21,7 +21,7 @@ import java.util.List;
  * </ul>
  */
 @Getter
-@Setter(AccessLevel.PACKAGE)
+@Setter
 @ToString
 @EqualsAndHashCode
 @NoArgsConstructor
@@ -39,6 +39,7 @@ public class Brand implements Serializable, EntityUpdate<Brand> {
 
     private String name;
 
+    @Setter(AccessLevel.PACKAGE)
     @ToString.Exclude
     @OneToMany(
             // Brand : Product = 1:N. 브랜드 삭제시 연관 상품도 모두 삭제 하도록 일관성을 지정한다.
@@ -47,6 +48,11 @@ public class Brand implements Serializable, EntityUpdate<Brand> {
             cascade = CascadeType.REMOVE
     )
     private List<Product> products;
+
+//    public Brand(String name, List<Product> products) {
+//        this.name = name;
+//        this.products = products;
+//    }
 
     @Override
     public void updateFrom(Brand src) {

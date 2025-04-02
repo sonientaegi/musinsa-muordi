@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.musinsa.muordi.common.util.NumberWithCommasSerializer;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
+@ActiveProfiles("test")
 class NumberWithCommasSerializerTest {
     static class AmountPack {
         public String name;

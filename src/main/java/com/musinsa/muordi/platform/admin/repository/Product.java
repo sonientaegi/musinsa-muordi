@@ -21,7 +21,7 @@ import java.io.Serializable;
  * PRODUCT는 상품을 판매하는 브랜드와 가격정보를 갖는다. 등록한 상품의 가격과 브랜드는 수정이 가능하다.
  */
 @Getter
-@Setter(AccessLevel.PACKAGE)
+@Setter
 @ToString
 @EqualsAndHashCode
 @NoArgsConstructor
@@ -44,11 +44,11 @@ public class Product implements Serializable, EntityUpdate<Product> {
     private Brand brand;
     private int price;
 
-    @Builder
-    public Product(Brand brand, int price) {
-        this.brand = brand;
-        this.price = price;
-    }
+//    @Builder
+//    public Product(Brand brand, int price) {
+//        this.brand = brand;
+//        this.price = price;
+//    }
 
     @Override
     public void updateFrom(Product src) {

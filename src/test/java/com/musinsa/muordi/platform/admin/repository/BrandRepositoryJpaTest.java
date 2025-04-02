@@ -2,28 +2,26 @@ package com.musinsa.muordi.platform.admin.repository;
 
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ActiveProfiles("test-admin-brand")
+/*
+JpaRepository의 save 동작 검증용. Create and Update 확인 용도로 테스트 함.
+*/
+@ActiveProfiles("test-empty")
 @SpringBootTest
 public class BrandRepositoryJpaTest {
-    /**
-     * DTO 테스트를 지원하기위해 제공하는 샘플 데이터 입니다.
-     * @return
-     */
-    public static Brand sample() {
-        return new Brand(1, "BRAND", null);
-    }
-
     @Autowired
     private BrandRepositoryJpa repository;
 
@@ -45,14 +43,10 @@ public class BrandRepositoryJpaTest {
         });
     }
 
-//    @AfterEach
-//    void tearDown() {
-//    }
-
-    // 다건 저장 & 갱신
     @Test
+    @DisplayName("다건 저장 & 수정")
     @Transactional
-    void saveAndUpdate() {
+    void testSaveAndUpdate() {
         Function<Brand,Brand> copyForTest = (src) -> {
             Brand dst = (Brand)src.clone();
             dst.setName("MODIFIED " + src.getName());

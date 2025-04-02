@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -31,7 +32,16 @@ public class AdminService {
      * @return 브랜드 DTO 리스트. null 일 수 없다.
      */
     public List<BrandDto> getBrands() {
-        return this.brandRepository.findAll().stream().map(this.brandDtoMapper::fromEntity).toList();
+        List<Brand> brands = this.brandRepository.findAll();
+
+        List<BrandDto> brandDtos = new ArrayList<>();
+        for (Brand brand : brands) {
+            brandDtos.add(this.brandDtoMapper.fromEntity(brand));
+        }
+        return brandDtos;
+
+
+        // return this.brandRepository.findAll().stream().map(this.brandDtoMapper::fromEntity).toList();
     }
 
     /**

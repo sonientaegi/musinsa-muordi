@@ -14,7 +14,10 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ActiveProfiles("test-display-showcase")
+/*
+SHOWCASE 의 JpaRepository 테스트
+ */
+@ActiveProfiles("test-display")
 @SpringBootTest
 class ShowcaseRepositoryJpaWrapperTest {
     @Autowired
@@ -29,7 +32,6 @@ class ShowcaseRepositoryJpaWrapperTest {
         return showcases.get(new Random().nextInt(showcases.size()));
     }
 
-    // 쇼케이스 전체 조회.
     @Test
     @DisplayName("쇼케이스 전체 조회")
     @Transactional
@@ -39,7 +41,6 @@ class ShowcaseRepositoryJpaWrapperTest {
         assertTrue(showcases.size() > 0);
     }
 
-    // 쇼케이스 상품 식별자 조회
     @Test
     @DisplayName("쇼케이스 상품 식별자 조회")
     @Transactional
@@ -50,7 +51,6 @@ class ShowcaseRepositoryJpaWrapperTest {
         assertEquals(expected, actual.get());
     }
 
-    // 브랜드 식별자로 쇼케이스 조회
     @Test
     @DisplayName("브랜드 식별자로 쇼케이스 조회")
     @Transactional
@@ -65,7 +65,6 @@ class ShowcaseRepositoryJpaWrapperTest {
         });
     }
 
-    // 브랜드 이름으로 쇼케이스 조회
     @Test
     @DisplayName("브랜드 이름으로 쇼케이스 조회")
     @Transactional
@@ -79,7 +78,6 @@ class ShowcaseRepositoryJpaWrapperTest {
         });
     }
 
-    // 카테고리 식별자로 쇼케이스 조회
     @Test
     @DisplayName("카테고리 식별지로 쇼케이스 조회")
     @Transactional
@@ -93,7 +91,6 @@ class ShowcaseRepositoryJpaWrapperTest {
         });
     }
 
-    // 카테고리 이름으로 쇼케이스 조회
     @Test
     @DisplayName("카테고리 이름으로 쇼케이스 조회")
     @Transactional
@@ -107,7 +104,6 @@ class ShowcaseRepositoryJpaWrapperTest {
         });
     }
 
-    // 쇼케이스 생성
     @Test
     @DisplayName("쇼케이스 생성")
     @Transactional
@@ -132,7 +128,6 @@ class ShowcaseRepositoryJpaWrapperTest {
         assertEquals(expected.getCategory(), actual.getCategory());
     }
 
-    // 쇼케이스 수정
     @Test
     @DisplayName("쇼케이스 수정 - 카테고리 변경")
     @Transactional
@@ -149,7 +144,6 @@ class ShowcaseRepositoryJpaWrapperTest {
         assertEquals(expectedCategory, actual.getCategory());
     }
 
-    // 쇼케이스 중복 생성 실패. 하나의 상품을 여러 카테고리에 등록할 수 없다.
     @Test
     @DisplayName("쇼케이스 중복 생성 실패 - 동일한 상품")
     @Transactional

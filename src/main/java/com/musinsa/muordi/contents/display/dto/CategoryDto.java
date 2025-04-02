@@ -22,7 +22,7 @@ import lombok.*;
 @ToString
 @EqualsAndHashCode
 @NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@AllArgsConstructor
 public class CategoryDto {
     private Integer id;
     private String name;

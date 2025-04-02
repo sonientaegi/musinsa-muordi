@@ -1,29 +1,26 @@
 package com.musinsa.muordi.platform.admin.repository;
 
+import com.musinsa.muordi.common.exception.RepositoryEntityNotExistException;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.*;
-import java.util.function.Function;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ActiveProfiles("test-admin-brand")
+/*
+BRAND 의 JpaRepository 테스트
+ */
+@ActiveProfiles("test-empty")
 @SpringBootTest
 public class BrandRepositoryJpaWrapperTest {
-    /**
-     * DTO 테스트를 지원하기위해 제공하는 샘플 데이터 입니다.
-     * @return
-     */
-    public static Brand sample() {
-        return new Brand(1, "BRAND", null);
-    }
-
     @Autowired
     private BrandRepositoryJpaWrapper repository;
 
@@ -44,36 +41,33 @@ public class BrandRepositoryJpaWrapperTest {
         });
     }
 
-//    @AfterEach
-//    void tearDown() {
-//    }
-
-    // 모든 브랜드 조회.
     @Test
+    @DisplayName("모든 브랜드 조회")
     @Transactional
-    void all() {
+    void testAll() {
         List<Brand> actuals = repository.findAll();
         assertNotNull(actuals);
         assertEquals(this.testCases.size(), actuals.size());
         actuals.forEach(actual -> {
+            // ID 검증
             Brand expected = this.testCases.get(actual.getId());
             assertEquals(expected, actual);
         });
     }
 
-    // 식별자 조회.
     @Test
+    @DisplayName("브랜드 ID 조회")
     @Transactional
-    void  findById() {
+    void testFindById() {
         this.testCases.values().forEach(testCase -> {
             assertEquals(testCase, this.repository.findById(testCase.getId()).orElse(null));
         });
     }
 
-    // 명칭 조회.
     @Test
+    @DisplayName("브랜드 이름 조회")
     @Transactional
-    void findByName() {
+    void testFindByName() {
         this.testCases.values().stream().map(Brand::getName).forEach(name -> {
             List<Brand> actuals = this.repository.findByName(name);
             assertNotNull(actuals);
@@ -84,25 +78,25 @@ public class BrandRepositoryJpaWrapperTest {
         });
     }
 
-    // 존재하지 않는 브랜드 식별자 조회.
-    //
     @Test
+    @DisplayName("브랜드 ID 조회 - 존재하지 않는 ID")
     @Transactional
-    void findByIdNotExists() {
-        assertThrows(NoSuchElementException.class, () -> {this.repository.findById(Integer.MIN_VALUE).get();});
+    void testFindByIdNotExists() {
+        assertNull(this.repository.findById(Integer.MIN_VALUE).orElse(null));
     }
 
-    // 존재하지 않는 브랜드 명칭 조회ㅣ.
+
     @Test
+    @DisplayName("브랜드 이름 조회 - 존재하지 않는 이름")
     @Transactional
-    void findByNameNotExists() {
+    void testFindByNameNotExists() {
         assertEquals(0, this.repository.findByName("BRAND" + Integer.MAX_VALUE).size());
     }
 
-    // 단건 저장
     @Test
+    @DisplayName("브랜드 저장")
     @Transactional
-    void save() {
+    void testSave() {
         Brand target = new Brand(null, "BRAND" + Integer.MAX_VALUE,null);
         Brand actual = this.repository.create(target);
         assertNotNull(actual);
@@ -110,29 +104,29 @@ public class BrandRepositoryJpaWrapperTest {
         assertTrue(target.getName().equals(actual.getName()));
     }
 
-    // 단건 갱신
     @Test
+    @DisplayName("브랜드 수정")
     @Transactional
-    void update() {
+    void testUpdate() {
         Brand testCase = this.testCases.values().iterator().next();
-        Brand expected = (Brand) testCase.clone();
+        Brand expected = testCase.clone();
         expected.setName("BRAND" + Integer.MAX_VALUE);
         Brand actual = this.repository.create(expected);
         assertNotNull(actual);
         assertEquals(expected, actual);
     }
 
-    // 존재하지 않는 키 저장
-    // 예외 발생 : ObjectOptimisticLockingFailureException
     @Test
-    @Transactional // <- 일부러 rollback을 일으킬거임.
-    void saveNotExists() {
-        Brand expected = new Brand(Integer.MAX_VALUE, "MAL BRAND", null);
-        assertThrows(ObjectOptimisticLockingFailureException.class, ()->this.repository.create(expected));
+    @DisplayName("브랜드 수정 - 존재하지 않는 ID")
+    @Transactional
+    void testUndateNotExists() {
+        // 예외 발생해야함.
+        Brand expected = new Brand(null, "MAL BRAND", null);
+        assertThrows(RepositoryEntityNotExistException.class, ()->this.repository.update(Integer.MAX_VALUE, expected));
     }
 
-    // 단건 삭제
     @Test
+    @DisplayName("브랜드 삭제")
     @Transactional
     void delete() {
         Brand tc = this.testCases.values().iterator().next();
@@ -140,12 +134,10 @@ public class BrandRepositoryJpaWrapperTest {
         assertNull(this.repository.findById(tc.getId()).orElse(null));
     }
 
-    // 존재하지 않는 레코드 삭제
     @Test
+    @DisplayName("브랜드 삭제 - 존재하지 않는 ID")
     @Transactional
     void deleteNotExists() {
-        int fakeId = Integer.MAX_VALUE;
-        assertNull(this.repository.findById(fakeId).orElse(null));
-        assertDoesNotThrow(() -> this.repository.delete(fakeId));
+        assertThrows(RepositoryEntityNotExistException.class, ()->this.repository.delete(Integer.MAX_VALUE));
     }
 }

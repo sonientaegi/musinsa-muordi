@@ -17,31 +17,49 @@ import java.util.Optional;
 public class BrandRepositoryJpaWrapper implements BrandRepository {
     private final BrandRepositoryJpa repository;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Brand> findAll() {
         return this.repository.findAll();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<Brand> findById(int id) {
         return this.repository.findById(id);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Brand> findByName(String name) {
         return this.repository.findByName(name);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Brand create(Brand brand) {
         return this.repository.save(brand);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Brand update(int id, Brand brand) {
         return this.repository.updateById(id, brand);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Brand delete(int id) {
         try {

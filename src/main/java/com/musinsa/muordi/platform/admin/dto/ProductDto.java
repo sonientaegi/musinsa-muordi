@@ -25,19 +25,19 @@ import lombok.*;
 @ToString
 @EqualsAndHashCode
 @NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@AllArgsConstructor
 public class ProductDto {
     private Long id;
     private int brandId;
     private String brandName;
     private int price;
 
-    @Builder
-    public ProductDto(int brandId, String brandName, int price) {
-        this.brandId = brandId;
-        this.brandName = brandName;
-        this.price = price;
-    }
+//    @Builder
+//    public ProductDto(int brandId, String brandName, int price) {
+//        this.brandId = brandId;
+//        this.brandName = brandName;
+//        this.price = price;
+//    }
 
     @Override
     public ProductDto clone() {

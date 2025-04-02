@@ -1,20 +1,20 @@
 package com.musinsa.muordi.contents.display.repository;
 
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.*;
-import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ActiveProfiles("test-display-category")
+/*
+CATEGORY 의 JpaRepository 테스트
+ */
+@ActiveProfiles("test-empty")
 @SpringBootTest
 public class CategoryRepositoryJpaTest {
     /**
@@ -26,7 +26,7 @@ public class CategoryRepositoryJpaTest {
     }
 
     @Autowired
-    CategoryRepositoryJpa repositoryJpa;
+    CategoryRepositoryJpa repository;
 
     // 테스트케이스
     private List<Category> testCases = new ArrayList<>();
@@ -34,7 +34,7 @@ public class CategoryRepositoryJpaTest {
     @BeforeEach
     void setUp() {
         // 테스트 케이스 생성.
-        this.testCases = this.repositoryJpa.saveAll(
+        this.testCases = this.repository.saveAll(
             List.of(
                 new Category(null, "CATEGORY 3", 5),
                 new Category(null, "CATEGORY 1", 1),
@@ -45,11 +45,11 @@ public class CategoryRepositoryJpaTest {
         );
     }
 
-    // 전시순서 정합성 제약조건 확인.
-    // 이미 존재하는 display_sequence 값을 입력하는 경우 unique key 조건을 위배하여 무결성오류예외를 반환한다.
     @Test
+    @DisplayName("전시순서 정합성 제약조건 확인")
+    // 이미 존재하는 display_sequence 값을 입력하는 경우 unique key 조건을 위배하여 무결성오류예외를 반환한다.
     @Transactional
-    void createCategoryExistedDisplaySequence() {
-        assertThrows(DataIntegrityViolationException.class, () -> this.repositoryJpa.save(new Category(null, "CATEGORY" + Integer.MAX_VALUE, 1)));
+    void testCreateCategoryExistedDisplaySequence() {
+        assertThrows(DataIntegrityViolationException.class, () -> this.repository.save(new Category(null, "CATEGORY" + Integer.MAX_VALUE, 1)));
     }
 }
