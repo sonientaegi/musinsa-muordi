@@ -2,6 +2,9 @@ package com.musinsa.muordi.common.exception;
 
 import lombok.Getter;
 
+/**
+ * DB 억세스 도중 데이터 중복 발생.
+ */
 @Getter
 public class RepositoryEntityDuplicatedException extends RepositoryException {
     protected final Object key;

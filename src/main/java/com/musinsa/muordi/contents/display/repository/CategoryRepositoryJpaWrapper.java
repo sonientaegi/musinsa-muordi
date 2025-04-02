@@ -14,15 +14,25 @@ import java.util.Optional;
 public class CategoryRepositoryJpaWrapper implements CategoryRepository {
     private final CategoryRepositoryJpa repository;
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public List<Category> findAll() {
         return this.repository.findAllByOrderByDisplaySequenceAsc();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Category> findByName(String name) {
         return this.repository.findByNameOrderByDisplaySequenceAsc(name);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<Category> findById(int id) {
         return this.repository.findById(id);

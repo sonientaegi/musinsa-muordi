@@ -49,11 +49,6 @@ public class Brand implements Serializable, EntityUpdate<Brand> {
     )
     private List<Product> products;
 
-//    public Brand(String name, List<Product> products) {
-//        this.name = name;
-//        this.products = products;
-//    }
-
     @Override
     public void updateFrom(Brand src) {
         this.setName(src.getName());

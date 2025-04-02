@@ -4,6 +4,9 @@ import lombok.*;
 
 import java.util.List;
 
+/**
+ * 카테고리별 최저가 브랜드 DTO.
+ */
 @Setter
 @Getter
 @Builder

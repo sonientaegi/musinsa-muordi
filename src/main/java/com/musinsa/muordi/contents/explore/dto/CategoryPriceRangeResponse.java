@@ -10,6 +10,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * 최고가, 최저가 응답.
+ */
 @Getter
 @NoArgsConstructor
 public class CategoryPriceRangeResponse {

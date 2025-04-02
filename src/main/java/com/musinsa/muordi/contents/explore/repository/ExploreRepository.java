@@ -5,6 +5,9 @@ import com.musinsa.muordi.contents.explore.dto.ItemDto;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * 가격 탐색 API의 명세이다.
+ */
 public interface ExploreRepository {
     /**
      * 문제 1.<br>

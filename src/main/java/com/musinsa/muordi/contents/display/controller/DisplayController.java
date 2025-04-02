@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
+/**
+ * 전시 도메인 컨트롤러.
+ */
 @RequestMapping("/api/display/v1")
 @RequiredArgsConstructor
 @RestController

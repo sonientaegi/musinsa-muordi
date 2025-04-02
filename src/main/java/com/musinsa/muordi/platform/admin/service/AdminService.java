@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 관리자 도메인 서비스이다.
+ */
 @RequiredArgsConstructor
 @Service
 public class AdminService {
@@ -39,9 +42,6 @@ public class AdminService {
             brandDtos.add(this.brandDtoMapper.fromEntity(brand));
         }
         return brandDtos;
-
-
-        // return this.brandRepository.findAll().stream().map(this.brandDtoMapper::fromEntity).toList();
     }
 
     /**

@@ -2,6 +2,9 @@ package com.musinsa.muordi.common.exception;
 
 import lombok.Getter;
 
+/**
+ * DB 억세스 도중 데이터 누락 발생.
+ */
 @Getter
 public class RepositoryEntityNotExistException extends RepositoryException {
     protected final Object key;

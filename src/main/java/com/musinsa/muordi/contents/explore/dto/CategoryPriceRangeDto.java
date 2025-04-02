@@ -2,6 +2,9 @@ package com.musinsa.muordi.contents.explore.dto;
 
 import lombok.*;
 
+/**
+ * 최고가, 최저가 DTO.
+ */
 @Setter
 @Getter
 @Builder

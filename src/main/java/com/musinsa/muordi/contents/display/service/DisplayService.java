@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Display 도메인 서비스.
+ * 전시 도메인 서비스.
  */
 @RequiredArgsConstructor
 @Service
@@ -150,7 +150,6 @@ public class DisplayService {
         Category category = this.categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("CATEGORY=%d".formatted(categoryId)));
 
         // 쇼케이스를 생성하고 DTO를 반환한다.
-        // TODO new Showcase 로 만들어지는게 맞나...
         return this.showcaseDtoMapper.fromEntity(this.showcaseRepository.create(this.showcaseDtoMapper.toEntity(product, category)));
     }
 

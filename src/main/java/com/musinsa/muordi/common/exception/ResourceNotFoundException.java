@@ -1,8 +1,10 @@
 package com.musinsa.muordi.common.exception;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 
+/**
+ * 조회 하고자 하는 자원이 없음.
+ */
 public class ResourceNotFoundException extends BaseException {
     protected final String detailMessage;
 

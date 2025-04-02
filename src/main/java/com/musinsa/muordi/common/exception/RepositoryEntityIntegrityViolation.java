@@ -2,6 +2,9 @@ package com.musinsa.muordi.common.exception;
 
 import lombok.Getter;
 
+/**
+ * DB 억세스 도중 데이터 정합성 결함 발생.
+ */
 @Getter
 public class RepositoryEntityIntegrityViolation extends RepositoryException {
     protected final Object key;

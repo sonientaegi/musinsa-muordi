@@ -5,6 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
 
+/**
+ * 어플리케이션 기본 예외.
+ */
 @Getter
 public class BaseException extends RuntimeException {
     private final HttpStatusCode httpStatusCode;

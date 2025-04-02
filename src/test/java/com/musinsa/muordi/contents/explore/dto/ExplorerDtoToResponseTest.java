@@ -1,8 +1,6 @@
 package com.musinsa.muordi.contents.explore.dto;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.musinsa.muordi.contents.explore.repository.ExploreRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +34,7 @@ class ExplorerDtoToResponseTest {
                 ))
                 .build();
 
-        CategoryBrandCheapestReponse response = CategoryBrandCheapestReponse.fromDto(dto);
+        CategoryBrandCheapestResponse response = CategoryBrandCheapestResponse.fromDto(dto);
         String[] jsonString = {""};
         assertDoesNotThrow(() -> jsonString[0] = objectMapper.writeValueAsString(response));
         String actual = jsonString[0];

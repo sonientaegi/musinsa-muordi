@@ -11,41 +11,65 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * 쇼케이스 JpaRepository의 래퍼이다
+ */
 @RequiredArgsConstructor
 @Service
 public class ShowcaseRepositoryJpaWrapper implements ShowcaseRepository {
     private final ShowcaseRepositoryJpa repository;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Showcase> findAll() {
         return this.repository.findAll();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<Showcase> findByProductId(long productId) {
         return this.repository.findByProduct_Id(productId);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Showcase> findByBrandId(int brandId) {
         return this.repository.findByProduct_Brand_Id(brandId);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Showcase> findByBrandName(String brandName) {
         return this.repository.findByProduct_Brand_Name(brandName);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Showcase> findByCategoryId(int categoryId) {
         return this.repository.findByCategory_Id(categoryId);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Showcase> findByCategoryName(String categoryName) {
         return this.repository.findByCategory_Name(categoryName);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Showcase create(Showcase showcase) {
         return this.repository.save(showcase);
@@ -64,6 +88,9 @@ public class ShowcaseRepositoryJpaWrapper implements ShowcaseRepository {
         return this.repository.updateById(targetId, showcase);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Showcase delete(long productId) {
         try {

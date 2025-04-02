@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 관리자 도메인 컨트롤러.
+ */
 @RequestMapping("/api/admin/v1")
 @RequiredArgsConstructor
 @RestController

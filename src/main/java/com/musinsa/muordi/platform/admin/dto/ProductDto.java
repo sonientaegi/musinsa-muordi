@@ -32,13 +32,6 @@ public class ProductDto {
     private String brandName;
     private int price;
 
-//    @Builder
-//    public ProductDto(int brandId, String brandName, int price) {
-//        this.brandId = brandId;
-//        this.brandName = brandName;
-//        this.price = price;
-//    }
-
     @Override
     public ProductDto clone() {
         return new ProductDto(this.id, this.brandId, this.brandName, this.price);

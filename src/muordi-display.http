@@ -10,7 +10,7 @@ GET http://{{host}}/api/display/v1/showcase/4
 ### 쇼케이스 브랜드 조회
 GET http://{{host}}/api/display/v1/showcase/brand/4
 
-### 쇼케이스 브랜드 명칭 조회
+### 쇼케이스 브랜드 이름 조회
 GET http://{{host}}/api/display/v1/showcase/brand/name/D
 
 ### 쇼케이스 카테고리 조회
@@ -31,6 +31,10 @@ Content-Type: application/json
 DELETE http://{{host}}/api/display/v1/showcase/4
 Content-Type: application/json
 
+### 쇼케이스 삭제 - 중복
+DELETE http://{{host}}/api/display/v1/showcase/4
+Content-Type: application/json
+
 ### 쇼케이스 생성
 POST http://{{host}}/api/display/v1/showcase
 Content-Type: application/json
@@ -40,6 +44,14 @@ Content-Type: application/json
   "categoryId":8
 }
 
+### 쇼케이스 생성 - 중복
+POST http://{{host}}/api/display/v1/showcase
+Content-Type: application/json
+
+{
+  "productId": 4,
+  "categoryId":8
+}
 
 
 

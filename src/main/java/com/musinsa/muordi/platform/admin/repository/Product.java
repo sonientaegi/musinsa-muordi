@@ -44,12 +44,6 @@ public class Product implements Serializable, EntityUpdate<Product> {
     private Brand brand;
     private int price;
 
-//    @Builder
-//    public Product(Brand brand, int price) {
-//        this.brand = brand;
-//        this.price = price;
-//    }
-
     @Override
     public void updateFrom(Product src) {
         this.setBrand(src.getBrand());

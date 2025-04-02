@@ -1,5 +1,7 @@
 package com.musinsa.muordi.contents.explore.service;
 
+import com.musinsa.muordi.common.exception.ResourceNotFoundException;
+import com.musinsa.muordi.common.exception.ShowcaseEmptyException;
 import com.musinsa.muordi.contents.display.dto.CategoryDto;
 import com.musinsa.muordi.contents.display.service.DisplayService;
 import com.musinsa.muordi.contents.explore.dto.*;
@@ -13,6 +15,9 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 탐색 도메인 서비스.
+ */
 @RequiredArgsConstructor
 @Service
 public class ExploreService {
@@ -53,10 +58,13 @@ public class ExploreService {
     /**
      * 카테고리별로 가장 저렴한 상품의 가격 정보와 가격의 합을 반환한다.
      * @return 카테고리 명칭, 브랜드 명칭을 포함하는 가격정보.
+     * @throws ShowcaseEmptyException 전시중이거나, 전시필수조건을 만족하는 상품이 하나도 없다.
      */
     public CategoryBrandCheapestDto getCheapestByCategory() {
         List<ItemDto> results = this.exploreRepository.getCheapestByCategory();
-        // TODO 결과가 없다면.
+        if (results.isEmpty()) {
+            throw new ShowcaseEmptyException();
+        }
 
         // 결과에 이름을 넣는다.
         List<ItemNamedDto> populatedResults = populateNameFieldAll(results);
@@ -74,11 +82,14 @@ public class ExploreService {
     /**
      * 단일 브랜드로 모든 카테고리의 제품을 구매할때 최저가인 브랜드와 상품의 금액, 그리고 합계를 반환한다. 단 전시 필수조건인 "모든 카테고리에 하나 이상의 제품을 전시"를
      * 만족하는 브랜드에 한하여 결과를 조회한다.
-     @return 카테고리 명칭, 브랜드 명칭을 포함하는 가격정보.
+     * @return 카테고리 명칭, 브랜드 명칭을 포함하는 가격정보.
+     * @throws ShowcaseEmptyException 전시중이거나, 전시필수조건을 만족하는 상품이 하나도 없다.
      */
     public BrandCheapestDto getCheapestBrand() {
         List<ItemDto> results = this.exploreRepository.getCheapestBrand();
-        // TODO 결과가 없다면.
+        if (results.isEmpty()) {
+            throw new ShowcaseEmptyException();
+        }
 
         // 결과에 이름을 넣는다.
         List<ItemNamedDto> populatedResults = populateNameFieldAll(results);
@@ -99,10 +110,11 @@ public class ExploreService {
      * 지정한 카테고리의 상품 중 상품 최댓값과 최솟값을 조회한다.
      * @param categoryName 대상 카테고리 이름..
      * @return 최댓값, 최솟값 가격정보.
+     * @throws ResourceNotFoundException 요청한 카테고리를 발견하지 못하였다.
+     * @throws ShowcaseEmptyException 전시중이거나, 전시필수조건을 만족하는 상품이 하나도 없다.
      */
     public CategoryPriceRangeDto PriceRangeofCategoryByName(String categoryName) {
         // 카테고리 식별자를 구한다.
-        // TODO 카테고리 없으면부 예외 처리로 반환하자.
         CategoryDto category = this.displayService.getCategoryByName(categoryName);
         int categoryId = category.getId();
 
@@ -124,8 +136,6 @@ public class ExploreService {
             thread.start();
         }
 
-
-
         // 두 작업이 모두 종료할 때 까지 대기.
         try {
             for (Thread thread : threads) {
@@ -135,9 +145,9 @@ public class ExploreService {
             throw new RuntimeException(e);
         }
 
-//        // Nont Thread
-//        results[0] = this.populateNameField(this.exploreRepository.getMinPriceOfCategory(categoryId).orElse(null));
-//        results[1] = this.populateNameField(this.exploreRepository.getMaxPriceOfCategory(categoryId).orElse(null));
+        if (results[0] == null || results[1] == null) {
+            throw new ShowcaseEmptyException();
+        }
 
         return CategoryPriceRangeDto.builder()
                 .minPriceRecord(results[0])

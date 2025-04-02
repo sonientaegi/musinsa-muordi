@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 
+/**
+ * JPA 기반의 가격 탐색 구현체 이다.
+ */
 @Component
 @RequiredArgsConstructor
 public class ExploreRepositoryJpa implements ExploreRepository {

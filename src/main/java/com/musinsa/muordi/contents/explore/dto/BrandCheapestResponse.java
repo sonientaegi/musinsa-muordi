@@ -1,15 +1,19 @@
 package com.musinsa.muordi.contents.explore.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.musinsa.muordi.common.util.NumberWithCommasSerializer;
-import lombok.*;
-import org.springframework.format.annotation.NumberFormat;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 최저가 브랜드 응답.
+ */
 @Getter
 @NoArgsConstructor
 public class BrandCheapestResponse {
