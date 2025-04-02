@@ -73,7 +73,7 @@ public class CategoryRepositoryJpaWrapperTest {
         this.testCases.forEach(expected -> {
             assertEquals(expected, this.repository.findById(expected.getId()).orElse(null));
         });
-    };
+    }
 
     @Test
     @DisplayName("카테고리 ID 조회 - 없는 ID")

@@ -25,7 +25,7 @@ public class BrandRepositoryJpaTest {
     @Autowired
     private BrandRepositoryJpa repository;
 
-    private Map<Integer, Brand> testCases = new HashMap<>();
+    private final Map<Integer, Brand> testCases = new HashMap<>();
 
     @BeforeEach
     void setUp() {
@@ -48,7 +48,7 @@ public class BrandRepositoryJpaTest {
     @Transactional
     void testSaveAndUpdate() {
         Function<Brand,Brand> copyForTest = (src) -> {
-            Brand dst = (Brand)src.clone();
+            Brand dst = src.clone();
             dst.setName("MODIFIED " + src.getName());
             return dst;
         };
@@ -82,7 +82,7 @@ public class BrandRepositoryJpaTest {
             }
 
             // 값 확인
-            assertTrue(expected.getName().equals(actual.getName()));
+            assertEquals(expected.getName(), actual.getName());
         }
     }
 }

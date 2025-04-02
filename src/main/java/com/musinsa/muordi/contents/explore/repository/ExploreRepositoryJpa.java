@@ -59,7 +59,7 @@ select distinct on (CATEGORY_ID) CATEGORY_ID, BRAND_ID, PRICE from (
         Set<Integer> distinct = new HashSet<>();
         List<ItemDto> results = new ArrayList<>();
         this.getCheapestProductOfCategoryBrand().forEach(result -> {
-            ItemDto record = (ItemDto) result;
+            ItemDto record = result;
             if (!distinct.contains(record.getCategoryId())) {
                 distinct.add(record.getCategoryId());
                 results.add(record);

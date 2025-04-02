@@ -1,7 +1,7 @@
 package com.musinsa.muordi.platform.admin.repository;
 
-import com.musinsa.muordi.common.exception.RepositoryEntityIntegrityViolation;
-import com.musinsa.muordi.common.exception.RepositoryEntityNotExistException;
+import com.musinsa.muordi.common.exception.RepositoryIntegrityException;
+import com.musinsa.muordi.common.exception.RepositoryNotExistException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
@@ -63,11 +63,11 @@ public class BrandRepositoryJpaWrapper implements BrandRepository {
     @Override
     public Brand delete(int id) {
         try {
-            Brand brand = this.repository.findById(id).orElseThrow(() -> new RepositoryEntityNotExistException("BRAND", id));
+            Brand brand = this.repository.findById(id).orElseThrow(() -> new RepositoryNotExistException("BRAND", id));
             this.repository.delete(brand);
             return brand;
         } catch (DataIntegrityViolationException e) {
-            throw new RepositoryEntityIntegrityViolation("BRAND", "DELETE", id);
+            throw new RepositoryIntegrityException("BRAND", id);
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.musinsa.muordi.platform.admin.repository;
 
-import com.musinsa.muordi.common.exception.RepositoryEntityNotExistException;
+import com.musinsa.muordi.common.exception.RepositoryNotExistException;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,7 +31,7 @@ public class ProductRepositoryJpaWrapperTest {
     private ProductRepositoryJpaWrapper repository;
 
     // 테스트케이스
-    private Map<Long, Product> testCases = new HashMap<>();
+    private final Map<Long, Product> testCases = new HashMap<>();
 
     @BeforeEach
     void setUp() {
@@ -192,6 +192,6 @@ public class ProductRepositoryJpaWrapperTest {
         Product expected = this.randProduct();
         expected.setPrice(Integer.MAX_VALUE);
 
-        assertThrows(RepositoryEntityNotExistException.class, () -> this.repository.update(Integer.MIN_VALUE, expected));
+        assertThrows(RepositoryNotExistException.class, () -> this.repository.update(Integer.MIN_VALUE, expected));
     }
 }

@@ -1,7 +1,7 @@
 package com.musinsa.muordi.platform.admin.repository;
 
-import com.musinsa.muordi.common.exception.RepositoryEntityIntegrityViolation;
-import com.musinsa.muordi.common.exception.RepositoryEntityNotExistException;
+import com.musinsa.muordi.common.exception.RepositoryIntegrityException;
+import com.musinsa.muordi.common.exception.RepositoryNotExistException;
 import lombok.NonNull;
 import org.hibernate.PessimisticLockException;
 
@@ -51,7 +51,7 @@ public interface ProductRepository {
      * @param id 수정할 상품 ID.
      * @param product 수정할 상품 내용.
      * @return 수정한 상품 entity. null 일 수 없다.
-     * @throws RepositoryEntityNotExistException 수정하려는 상품이 존재하지 않는다.
+     * @throws RepositoryNotExistException 수정하려는 상품이 존재하지 않는다.
       * @throws PessimisticLockException 락 획득에 실패했다.
      */
     Product update(long id, @NonNull Product product);
@@ -60,8 +60,8 @@ public interface ProductRepository {
      * 기존의 상품을 삭제하고, 기존 상품의 entity를 반환한다. 실패시 예외를 반환한다.
      * @param id 삭제할 상품 ID.
      * @return 삭제 한 상품 entity. null 일 수 없다.
-     * @throws RepositoryEntityNotExistException 삭제하려는 상품이 존재하지 않는다.
-     * @throws RepositoryEntityIntegrityViolation 정합성 오류로 인해 상품을 삭제할 수 없다.
+     * @throws RepositoryNotExistException 삭제하려는 상품이 존재하지 않는다.
+     * @throws RepositoryIntegrityException 상품이 다른 곳에서 참조중이라 삭제할 수 없다.
      */
     Product delete(long id);
 }

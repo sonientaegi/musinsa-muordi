@@ -1,8 +1,7 @@
 package com.musinsa.muordi.contents.display.service;
 
-import com.musinsa.muordi.common.exception.RepositoryEntityDuplicatedException;
-import com.musinsa.muordi.common.exception.RepositoryEntityNotExistException;
-import com.musinsa.muordi.common.exception.ResourceNotFoundException;
+import com.musinsa.muordi.common.exception.AlreadyDoneException;
+import com.musinsa.muordi.common.exception.NotFoundException;
 import com.musinsa.muordi.contents.display.dto.CategoryDto;
 import com.musinsa.muordi.contents.display.dto.CategoryDtoMapper;
 import com.musinsa.muordi.contents.display.dto.ShowcaseDto;
@@ -50,22 +49,22 @@ public class DisplayService {
      * 카테고리 ID를 조회한다. 카테고리 ID는 유일한 식별자이다.
      * @param id 카테고리 ID.
      * @return 카테고리 DTO. null 일 수 없다.
-     * @throws ResourceNotFoundException 입력받은 ID의 카테고리가 존재하지 않는다.
+     * @throws NotFoundException 입력받은 ID의 카테고리가 존재하지 않는다.
      */
     public CategoryDto getCategory(int id) {
-        return this.categoryDtoMapper.fromEntity(this.categoryRepository.findById(id).orElseThrow(ResourceNotFoundException::new));
+        return this.categoryDtoMapper.fromEntity(this.categoryRepository.findById(id).orElseThrow(NotFoundException::new));
     }
 
     /**
      * 카테고리 이름으로 카테고리를 조회한다. 만약 같은 이름의 카테고리가 여러개 있다면 전시순사가 가장 높은 하나를 반환한다.
      * @param name 카테고리 이름.
      * @return 카테고리 DTO. null 일 수 없다.
-     * @throws ResourceNotFoundException 입력받은 이름의 카테고리가 존재하지 않는다.
+     * @throws NotFoundException 입력받은 이름의 카테고리가 존재하지 않는다.
      */
     public CategoryDto getCategoryByName(String name) {
         List<Category> categories = this.categoryRepository.findByName(name);
         if (categories.isEmpty()) {
-            throw new ResourceNotFoundException();
+            throw new NotFoundException();
         } else {
             return this.categoryDtoMapper.fromEntity(categories.get(0));
         }
@@ -83,10 +82,10 @@ public class DisplayService {
      * 상품의 쇼케이스 정보를 반환한다.
      * @param productId 상품 ID.
      * @return 쇼케이스 DTO. null 일 수 없다.
-     * @throws ResourceNotFoundException 입력받은 상품의 쇼케이스 정보가 없다.
+     * @throws NotFoundException 입력받은 상품의 쇼케이스 정보가 없다.
      */
     public ShowcaseDto getShowcase(long productId) {
-        return this.showcaseDtoMapper.fromEntity(this.showcaseRepository.findByProductId(productId).orElseThrow(ResourceNotFoundException::new));
+        return this.showcaseDtoMapper.fromEntity(this.showcaseRepository.findByProductId(productId).orElseThrow(NotFoundException::new));
     }
 
     /**
@@ -133,21 +132,21 @@ public class DisplayService {
      * @param productId 상품 ID.
      * @param categoryId 카테고리 ID.
      * @return 생성한 쇼케이스 DTO. null 일 수 없다.
-     * @throws RepositoryEntityNotExistException 해당 상품이 쇼케이스에 등록되어있다.
-     * @throws ResourceNotFoundException 해당 상품이 존재하지 않는다.
+     * @throws AlreadyDoneException 해당 상품이 쇼케이스에 등록되어있다.
+     * @throws NotFoundException 해당 상품이 존재하지 않는다.
      */
     @Transactional
     public ShowcaseDto createShowcase(long productId, int categoryId) {
         // 상품이 이미 등록되어있는지를 확인한다.
         if (this.showcaseRepository.findByProductId(productId).isPresent()) {
-            throw new RepositoryEntityDuplicatedException("SHOWCASE", productId);
+            throw new AlreadyDoneException("PRODUCT:%d".formatted(productId), "DISPLAY");
         }
 
         // 상품 존재 여부를 검증한다.
-        Product product = this.productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("PRODUCT=%d".formatted(productId)));
+        Product product = this.productRepository.findById(productId).orElseThrow(() -> new NotFoundException("PRODUCT", productId));
 
         // 카테고리 존재 여부를 검증한다.
-        Category category = this.categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("CATEGORY=%d".formatted(categoryId)));
+        Category category = this.categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("CATEGORY", categoryId));
 
         // 쇼케이스를 생성하고 DTO를 반환한다.
         return this.showcaseDtoMapper.fromEntity(this.showcaseRepository.create(this.showcaseDtoMapper.toEntity(product, category)));
@@ -158,15 +157,15 @@ public class DisplayService {
      * @param productId 수정하고 싶은 상품 ID.
      * @param categoryId 지정하려는 카테고리 ID.
      * @return 수정한 쇼케이스 DTO. null 일 수 없다.
-     * @throws ResourceNotFoundException 변경하려는 카테고리나 상품이 존재하지 않는다.
+     * @throws NotFoundException 변경하려는 카테고리나 상품이 존재하지 않는다.
      */
     @Transactional
     public ShowcaseDto updateShowcase(long productId, int categoryId) {
         // 상품 존재 여부를 검증한다.
-        Product product = this.productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("PRODUCT=%d".formatted(productId)));
+        Product product = this.productRepository.findById(productId).orElseThrow(() -> new NotFoundException("PRODUCT", productId));
 
         // 카테고리 존재 여부를 검증한다.
-        Category category = this.categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("CATEGORY=%d".formatted(categoryId)));
+        Category category = this.categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("CATEGORY", categoryId));
 
         // 수정을 위한 entity를 생성한다.
         Showcase showcase = this.showcaseDtoMapper.toEntity(product, category);
@@ -178,9 +177,11 @@ public class DisplayService {
     /**
      * 상품 식별자로 쇼케이스를 지운다.
      * @param productId 상품 식별자
+     * @throws NotFoundException 진열 해제하려는 상품이 존재하지 않는다.
      */
     @Transactional
     public void deleteShowcase(long productId) {
+        this.showcaseRepository.findByProductId(productId).orElseThrow(NotFoundException::new);
         this.showcaseRepository.delete(productId);
     }
 }

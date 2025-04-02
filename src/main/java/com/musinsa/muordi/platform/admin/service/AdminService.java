@@ -1,12 +1,14 @@
 package com.musinsa.muordi.platform.admin.service;
 
-import com.musinsa.muordi.common.exception.RepositoryEntityNotExistException;
-import com.musinsa.muordi.common.exception.ResourceNotFoundException;
+import com.musinsa.muordi.common.exception.NotFoundException;
 import com.musinsa.muordi.platform.admin.dto.BrandDto;
 import com.musinsa.muordi.platform.admin.dto.BrandDtoMapper;
 import com.musinsa.muordi.platform.admin.dto.ProductDto;
 import com.musinsa.muordi.platform.admin.dto.ProductDtoMapper;
-import com.musinsa.muordi.platform.admin.repository.*;
+import com.musinsa.muordi.platform.admin.repository.Brand;
+import com.musinsa.muordi.platform.admin.repository.BrandRepository;
+import com.musinsa.muordi.platform.admin.repository.Product;
+import com.musinsa.muordi.platform.admin.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -48,10 +50,10 @@ public class AdminService {
      * 브랜드 ID를 조회한다. 브랜드 ID는 유일한 식별자이다.
      * @param id 브랜드 ID.
      * @return 브랜드 DTO. null 일 수 없다.
-     * @throws ResourceNotFoundException 입력받은 ID의 브랜드가 존재하지 않는다.
+     * @throws NotFoundException 입력받은 ID의 브랜드가 존재하지 않는다.
      */
     public BrandDto getBrand(int id) {
-        return this.brandDtoMapper.fromEntity(this.brandRepository.findById(id).orElseThrow(ResourceNotFoundException::new));
+        return this.brandDtoMapper.fromEntity(this.brandRepository.findById(id).orElseThrow(NotFoundException::new));
     }
 
     /**
@@ -80,28 +82,22 @@ public class AdminService {
      * @param id 수정하려는 브랜드 ID.
      * @param brandDto 수정하려는 브랜드 DTO.
      * @return 수정한 브랜드 DTO. null일 수 없다.
-     * @throws ResourceNotFoundException 수정하려는 브랜드가 존재하지 않는다.
+     * @throws NotFoundException 수정하려는 브랜드가 존재하지 않는다.
      */
     @Transactional
     public BrandDto updateBrand(int id, @NonNull BrandDto brandDto) {
-        try {
-            return this.brandDtoMapper.fromEntity(this.brandRepository.update(id, this.brandDtoMapper.toEntity(brandDto)));
-        } catch (RepositoryEntityNotExistException e) {
-            throw new ResourceNotFoundException();
-        }
+        this.brandRepository.findById(id).orElseThrow(NotFoundException::new);
+        return this.brandDtoMapper.fromEntity(this.brandRepository.update(id, this.brandDtoMapper.toEntity(brandDto)));
     }
 
     /**
      * 브랜드를 삭제한다. 만약 삭제하려는 브랜드가 없거나 삭제에 실패했다면 예외를 반환한다.
      * @param id 삭제하려는 브랜드 ID.
-     * @throws ResourceNotFoundException 삭제하려는 브랜드가 존재하지 않는다.
+     * @throws NotFoundException 삭제하려는 브랜드가 존재하지 않는다.
      */
     public void deleteBrand(int id) {
-        try {
-            this.brandRepository.delete(id);
-        } catch (RepositoryEntityNotExistException e) {
-            throw new ResourceNotFoundException();
-        }
+        this.brandRepository.findById(id).orElseThrow(NotFoundException::new);
+        this.brandRepository.delete(id);
     }
 
     /**
@@ -116,10 +112,10 @@ public class AdminService {
      * 상품 ID를 조회한다. 상품 ID는 유일한 식별자이다.
      * @param id 상품 ID.
      * @return 상품 DTO. null 일 수 없다.
-     * @throws ResourceNotFoundException 입력받은 ID의 상품이 존재하지 않는다.
+     * @throws NotFoundException 입력받은 ID의 상품이 존재하지 않는다.
      */
     public ProductDto getProduct(long id) {
-        return this.productDtoMapper.fromEntity(this.productRepository.findById(id).orElseThrow(ResourceNotFoundException::new));
+        return this.productDtoMapper.fromEntity(this.productRepository.findById(id).orElseThrow(NotFoundException::new));
     }
 
     /**
@@ -145,12 +141,12 @@ public class AdminService {
      * @param productDto 새로 생성할 상품 DTO.
      * @return 새로 생성한 상품 DTO.
      * @throws OptimisticLockingFailureException 락에 의해 생성 실패하였다.
-     * @throws ResourceNotFoundException 참조하려는 브랜드가 존재하지 않는다.
+     * @throws NotFoundException 참조하려는 브랜드가 존재하지 않는다.
      */
     public ProductDto createProduct(@NonNull ProductDto productDto) {
         // 브랜드 존재 여부 확인.
         int brandId = productDto.getBrandId();
-        Brand brand = this.brandRepository.findById(brandId).orElseThrow(() -> new ResourceNotFoundException("BRAND ID=%d".formatted(brandId)));
+        Brand brand = this.brandRepository.findById(brandId).orElseThrow(() -> new NotFoundException("BRAND", brandId));
 
         // 브랜드는 직접 주입해줘야한다.
         Product product = this.productDtoMapper.toEntity(productDto, brand);
@@ -166,35 +162,29 @@ public class AdminService {
      * @param id 수정하려는 상품 ID.
      * @param productDto 수정하려는 상품 DTO.
      * @return 수정한 상품 DTO. null 일 수 없다.
-     * @throws ResourceNotFoundException 수정하려는 상품이나, 참조하는 브랜드가 존재하지 않는다.
+     * @throws NotFoundException 수정하려는 상품이나, 참조하는 브랜드가 존재하지 않는다.
      */
     public ProductDto updateProduct(long id, @NonNull ProductDto productDto) {
+        // 상품 존재 여부 확인.
+        this.productRepository.findById(id).orElseThrow(NotFoundException::new);
+
         // 브랜드 존재 여부 확인.
         int brandId = productDto.getBrandId();
-        Brand brand = this.brandRepository.findById(brandId).orElseThrow(() -> new ResourceNotFoundException("BRAND ID=%d".formatted(brandId)));
+        Brand brand = this.brandRepository.findById(brandId).orElseThrow(() -> new NotFoundException("BRAND", brandId));
 
         // 브랜드는 직접 주입해줘야한다.
         Product product = this.productDtoMapper.toEntity(productDto, brand);
 
-        // 상품 업데인트.
-        try {
-            // TODO 브랜드 없는 경우 예외 처리 명시.
-            return this.productDtoMapper.fromEntity(this.productRepository.update(id, product));
-        } catch (RepositoryEntityNotExistException e) {
-            throw new ResourceNotFoundException();
-        }
+        return this.productDtoMapper.fromEntity(this.productRepository.update(id, product));
     }
 
     /**
      * 상품을 삭제한다. 만약 삭제하려는 상품이 없거나 삭제에 실패했다면 예외를 반환한다.
      * @param id 삭제하려는 상품 ID.
-     * @throws ResourceNotFoundException 삭제하려는 상품이 존재하지 않는다.
+     * @throws NotFoundException 삭제하려는 상품이 존재하지 않는다.
      */
     public void deleteProduct(long id) {
-        try {
-            this.productRepository.delete(id);
-        } catch (RepositoryEntityNotExistException e) {
-            throw new ResourceNotFoundException();
-        }
+        this.productRepository.findById(id).orElseThrow(NotFoundException::new);
+        this.productRepository.delete(id);
     }
 }

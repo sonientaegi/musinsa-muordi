@@ -20,7 +20,7 @@ import java.text.DecimalFormat;
  * </pre>
  */
 public class NumberWithCommasSerializer extends JsonSerializer<Object> {
-    private DecimalFormat df = new DecimalFormat("###,###");
+    private final DecimalFormat df = new DecimalFormat("###,###");
 
     @Override
     public void serialize(Object value, JsonGenerator gen, SerializerProvider serializers) throws IOException {

@@ -1,6 +1,6 @@
 package com.musinsa.muordi.contents.explore.service;
 
-import com.musinsa.muordi.common.exception.ResourceNotFoundException;
+import com.musinsa.muordi.common.exception.NotFoundException;
 import com.musinsa.muordi.common.exception.ShowcaseEmptyException;
 import com.musinsa.muordi.contents.display.dto.CategoryDto;
 import com.musinsa.muordi.contents.display.service.DisplayService;
@@ -110,7 +110,7 @@ public class ExploreService {
      * 지정한 카테고리의 상품 중 상품 최댓값과 최솟값을 조회한다.
      * @param categoryName 대상 카테고리 이름..
      * @return 최댓값, 최솟값 가격정보.
-     * @throws ResourceNotFoundException 요청한 카테고리를 발견하지 못하였다.
+     * @throws NotFoundException 요청한 카테고리를 발견하지 못하였다.
      * @throws ShowcaseEmptyException 전시중이거나, 전시필수조건을 만족하는 상품이 하나도 없다.
      */
     public CategoryPriceRangeDto PriceRangeofCategoryByName(String categoryName) {
@@ -119,7 +119,7 @@ public class ExploreService {
         int categoryId = category.getId();
 
         // 최대, 최소금액 구하는 작업은 동일한 API이므로 병렬로 동시 수행할 수 있다.
-        final ItemNamedDto results[] = {null, null};
+        final ItemNamedDto[] results = {null, null};
         List<Thread> threads = List.of(
                 // 최댓값 구하기
                 new Thread(() -> {

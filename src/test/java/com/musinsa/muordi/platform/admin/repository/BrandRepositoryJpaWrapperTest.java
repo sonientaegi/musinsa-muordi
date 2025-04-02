@@ -1,6 +1,6 @@
 package com.musinsa.muordi.platform.admin.repository;
 
-import com.musinsa.muordi.common.exception.RepositoryEntityNotExistException;
+import com.musinsa.muordi.common.exception.RepositoryNotExistException;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +24,7 @@ public class BrandRepositoryJpaWrapperTest {
     @Autowired
     private BrandRepositoryJpaWrapper repository;
 
-    private Map<Integer, Brand> testCases = new HashMap<>();
+    private final Map<Integer, Brand> testCases = new HashMap<>();
 
     @BeforeEach
     void setUp() {
@@ -101,7 +101,7 @@ public class BrandRepositoryJpaWrapperTest {
         Brand actual = this.repository.create(target);
         assertNotNull(actual);
         assertNotNull(actual.getId());
-        assertTrue(target.getName().equals(actual.getName()));
+        assertEquals(target.getName(), actual.getName());
     }
 
     @Test
@@ -122,7 +122,7 @@ public class BrandRepositoryJpaWrapperTest {
     void testUndateNotExists() {
         // 예외 발생해야함.
         Brand expected = new Brand(null, "MAL BRAND", null);
-        assertThrows(RepositoryEntityNotExistException.class, ()->this.repository.update(Integer.MAX_VALUE, expected));
+        assertThrows(RepositoryNotExistException.class, ()->this.repository.update(Integer.MAX_VALUE, expected));
     }
 
     @Test
@@ -138,6 +138,6 @@ public class BrandRepositoryJpaWrapperTest {
     @DisplayName("브랜드 삭제 - 존재하지 않는 ID")
     @Transactional
     void deleteNotExists() {
-        assertThrows(RepositoryEntityNotExistException.class, ()->this.repository.delete(Integer.MAX_VALUE));
+        assertThrows(RepositoryNotExistException.class, ()->this.repository.delete(Integer.MAX_VALUE));
     }
 }

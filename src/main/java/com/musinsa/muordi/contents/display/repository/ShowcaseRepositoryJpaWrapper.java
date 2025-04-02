@@ -1,9 +1,8 @@
 package com.musinsa.muordi.contents.display.repository;
 
-import com.musinsa.muordi.common.exception.RepositoryEntityIntegrityViolation;
-import com.musinsa.muordi.common.exception.RepositoryEntityNotExistException;
+import com.musinsa.muordi.common.exception.RepositoryIntegrityException;
+import com.musinsa.muordi.common.exception.RepositoryNotExistException;
 import com.musinsa.muordi.common.jpa.AtomicUpdateById;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -84,7 +83,7 @@ public class ShowcaseRepositoryJpaWrapper implements ShowcaseRepository {
     public Showcase update(Showcase showcase) {
         // 상품 ID로 쇼케이스 레코드 PK를 찾는다.
         long productId = showcase.getProduct().getId();
-        int targetId = this.findByProductId(productId).orElseThrow(()->new RepositoryEntityNotExistException("SHOWCASE", productId)).getId();
+        int targetId = this.findByProductId(productId).orElseThrow(()->new RepositoryNotExistException("SHOWCASE", productId)).getId();
         return this.repository.updateById(targetId, showcase);
     }
 
@@ -94,11 +93,11 @@ public class ShowcaseRepositoryJpaWrapper implements ShowcaseRepository {
     @Override
     public Showcase delete(long productId) {
         try {
-            Showcase showcase = this.findByProductId(productId).orElseThrow(() -> new RepositoryEntityNotExistException("SHOWCASE", productId));
+            Showcase showcase = this.findByProductId(productId).orElseThrow(() -> new RepositoryNotExistException("SHOWCASE", productId));
             this.repository.deleteById(showcase.getId());
             return showcase;
         } catch (DataIntegrityViolationException e) {
-            throw new RepositoryEntityIntegrityViolation("PRODUCT", "DELETE", productId);
+            throw new RepositoryIntegrityException("PRODUCT", productId);
         }
     }
 }

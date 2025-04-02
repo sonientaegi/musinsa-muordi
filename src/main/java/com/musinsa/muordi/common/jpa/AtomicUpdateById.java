@@ -1,6 +1,6 @@
 package com.musinsa.muordi.common.jpa;
 
-import com.musinsa.muordi.common.exception.RepositoryEntityNotExistException;
+import com.musinsa.muordi.common.exception.RepositoryNotExistException;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceException;
 import org.hibernate.PessimisticLockException;
@@ -64,7 +64,7 @@ public interface AtomicUpdateById<T extends EntityUpdate, K> extends JpaReposito
      */
     default T updateById(K id, T source) {
         // TODO Generic의 타입 T를 구하는 기능 구현 필요.
-        T target = this.findByIdWithLock(id).orElseThrow(() -> new RepositoryEntityNotExistException("T", id));
+        T target = this.findByIdWithLock(id).orElseThrow(() -> new RepositoryNotExistException("T", id));
         target.updateFrom(source);
         return this.save(target);
     }

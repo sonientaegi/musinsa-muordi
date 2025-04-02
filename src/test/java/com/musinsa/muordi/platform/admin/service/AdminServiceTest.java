@@ -1,6 +1,6 @@
 package com.musinsa.muordi.platform.admin.service;
 
-import com.musinsa.muordi.common.exception.ResourceNotFoundException;
+import com.musinsa.muordi.common.exception.NotFoundException;
 import com.musinsa.muordi.platform.admin.dto.BrandDto;
 import com.musinsa.muordi.platform.admin.dto.ProductDto;
 import jakarta.transaction.Transactional;
@@ -11,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -57,7 +56,7 @@ class AdminServiceTest {
     void testGetBrandsByNameNotExists() {
         List<BrandDto> actuals = this.service.getBrands("BRAND NEVER EXISTS!");
         assertNotNull(actuals);
-        assertTrue(actuals.size() == 0);
+        assertEquals(0, actuals.size());
     }
 
     @Test
@@ -72,7 +71,7 @@ class AdminServiceTest {
     @Test
     @DisplayName("브랜드 ID 조회 - 없는 ID")
     void testGetBrandByIdNotExists() {
-        assertThrows(ResourceNotFoundException.class, () -> this.service.getBrand(Integer.MAX_VALUE));
+        assertThrows(NotFoundException.class, () -> this.service.getBrand(Integer.MAX_VALUE));
     }
 
     @Test
@@ -103,7 +102,7 @@ class AdminServiceTest {
     void testUpdateBrandNotExists() {
         int target = Integer.MAX_VALUE;
         BrandDto expected = new BrandDto(null, "BRAND UPDATED");
-        assertThrows(ResourceNotFoundException.class, () -> this.service.updateBrand(target, expected));
+        assertThrows(NotFoundException.class, () -> this.service.updateBrand(target, expected));
     }
 
     @Test
@@ -112,7 +111,7 @@ class AdminServiceTest {
     void testDeleteBrand() {
         BrandDto target = this.randBrand();
         this.service.deleteBrand(target.getId());
-        assertThrows(ResourceNotFoundException.class, () -> this.service.getBrand(target.getId()));
+        assertThrows(NotFoundException.class, () -> this.service.getBrand(target.getId()));
     }
 
     @Test
@@ -147,7 +146,7 @@ class AdminServiceTest {
     void testGetProductsByBrandNameNotExist() {
         List<ProductDto> actuals = this.service.getProductsByBrandName("BRAND NEVER EXISTS!");
         assertNotNull(actuals);
-        assertTrue(actuals.size() == 0);
+        assertEquals(0, actuals.size());
     }
 
     @Test
@@ -215,7 +214,7 @@ class AdminServiceTest {
         expected.setBrandId(this.randBrand().getId());
         expected.setPrice(new Random().nextInt(100000));
 
-        assertThrows(ResourceNotFoundException.class, () -> this.service.updateProduct(target, expected));
+        assertThrows(NotFoundException.class, () -> this.service.updateProduct(target, expected));
     }
 
     @Test
@@ -224,7 +223,7 @@ class AdminServiceTest {
     void testUpdateProductWrongBrand() {
         ProductDto target = this.randProduct();
         target.setBrandId(Integer.MAX_VALUE);
-        assertThrows(ResourceNotFoundException.class, () -> this.service.updateProduct(target.getId(), target));
+        assertThrows(NotFoundException.class, () -> this.service.updateProduct(target.getId(), target));
     }
 
     @Test
@@ -233,6 +232,6 @@ class AdminServiceTest {
     void testDeleteProduct() {
         long target = this.randProduct().getId();
         this.service.deleteProduct(target);
-        assertThrows(ResourceNotFoundException.class, ()-> this.service.getProduct(target));
+        assertThrows(NotFoundException.class, ()-> this.service.getProduct(target));
     }
 }

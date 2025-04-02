@@ -1,7 +1,7 @@
 package com.musinsa.muordi.platform.admin.repository;
 
-import com.musinsa.muordi.common.exception.RepositoryEntityIntegrityViolation;
-import com.musinsa.muordi.common.exception.RepositoryEntityNotExistException;
+import com.musinsa.muordi.common.exception.RepositoryIntegrityException;
+import com.musinsa.muordi.common.exception.RepositoryNotExistException;
 import lombok.NonNull;
 import org.hibernate.PessimisticLockException;
 
@@ -44,7 +44,7 @@ public interface BrandRepository {
      * @param id 수정할 브랜드 ID.
      * @param brand 수정할 브랜드 내용.
      * @return 수정한 브랜드 entity. null 일 수 없다.
-     * @throws RepositoryEntityNotExistException 수정하려는 브랜드가 존재하지 않는다.
+     * @throws RepositoryNotExistException 수정하려는 브랜드가 존재하지 않는다.
      * @throws PessimisticLockException 락 획득에 실패했다.
      */
     Brand update(int id, @NonNull Brand brand);
@@ -53,8 +53,8 @@ public interface BrandRepository {
      * 기존의 브랜드를 삭제하고, 기존 브랜드의 entity를 반환한다. 실패시 예외를 반환한다.
      * @param id 삭제할 브랜드 ID.
      * @return 삭제 한 브랜드 entity. null 일 수 없다.
-     * @throws RepositoryEntityNotExistException 삭제하려는 브랜드가 존재하지 않는다.
-     * @throws RepositoryEntityIntegrityViolation 정합성 오류로 인해 브랜드를 삭제할 수 없다.
+     * @throws RepositoryNotExistException 삭제하려는 브랜드가 존재하지 않는다.
+     * @throws RepositoryIntegrityException 브랜드가 다른곳에서 참조중이라 삭제할 수 없다.
      */
     Brand delete(int id);
 }

@@ -1,7 +1,7 @@
 package com.musinsa.muordi.platform.admin.repository;
 
-import com.musinsa.muordi.common.exception.RepositoryEntityIntegrityViolation;
-import com.musinsa.muordi.common.exception.RepositoryEntityNotExistException;
+import com.musinsa.muordi.common.exception.RepositoryIntegrityException;
+import com.musinsa.muordi.common.exception.RepositoryNotExistException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -56,11 +56,11 @@ public class ProductRepositoryJpaWrapper implements ProductRepository {
     @Override
     public Product delete(long id) {
         try {
-            Product product = this.findById(id).orElseThrow(() -> new RepositoryEntityNotExistException("PRODUCT", id));
+            Product product = this.findById(id).orElseThrow(() -> new RepositoryNotExistException("PRODUCT", id));
             this.repository.delete(product);
             return product;
         } catch (DataIntegrityViolationException e) {
-            throw new RepositoryEntityIntegrityViolation("PRODUCT", "DELETE", id);
+            throw new RepositoryIntegrityException("PRODUCT", id);
         }
     }
 }

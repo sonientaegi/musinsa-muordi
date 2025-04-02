@@ -1,6 +1,6 @@
 package com.musinsa.muordi.contents.display.repository;
 
-import com.musinsa.muordi.common.exception.RepositoryEntityNotExistException;
+import com.musinsa.muordi.common.exception.RepositoryNotExistException;
 import lombok.NonNull;
 import org.hibernate.PessimisticLockException;
 
@@ -65,7 +65,7 @@ public interface ShowcaseRepository {
      * 쇼케이스에 진열한 상품의 전시 정보를 수정한다. 만약 상품이나 카테고리의 정보를 발견하지 못한다면 예외를 반환한다.
      * @param showcase 수정할 전시정보.
      * @return 수정한 쇼케이스 entity를 반환한다. null 일 수 없다.
-     * @throws RepositoryEntityNotExistException 수정하려는 상품이나 카테고리 정보가 존재하지 않는다.
+     * @throws RepositoryNotExistException 수정하려는 상품이나 카테고리 정보가 존재하지 않는다.
      * @throws PessimisticLockException 락 획득에 실패했다.
      */
     Showcase update(@NonNull Showcase showcase);
@@ -74,7 +74,7 @@ public interface ShowcaseRepository {
      * 상품의 쇼케이스 등록 정보를 삭제한다. 실패 시 예외를 반환한다.
      * @param productId 쇼케이스에서 제외 활 상품 ID.
      * @return 제외 한 상품 entity. null 일 수 없다.
-     * @throws RepositoryEntityNotExistException 제외 하려는 상품이 존재하지 않는다.
+     * @throws RepositoryNotExistException 제외 하려는 상품이 존재하지 않는다.
      */
     Showcase delete(long productId);
 }
