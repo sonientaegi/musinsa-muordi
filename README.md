@@ -89,6 +89,8 @@ java -Dspring.profiles.active=init -jar build/libs/muordi-0.0.1-SNAPSHOT.jar
 - 검색 및 통계 서비스를 제공합니다.
 - 과제의 API 1, 2, 3 을 제공합니다.
 
+---
+
 ## 과제 구현
 
 ### 입력
@@ -188,6 +190,8 @@ resources와 단위 테스트 파일은 스프링 표준 구조에 따라 배치
 
 ### 문제 해결
 
+_ES를 이용한 문제 해결은 후술한다._
+
 #### API 1
 <b>카테고리 별 최저가격 브랜드의 이름과 상품가격, 그리고 가격 총액 조회</b>
 ```h2
@@ -245,17 +249,136 @@ SHOWCASE-CATEGORY 테이블을 조인하여 카테고리 이름 조건으로 최
 ### API 4
 각 도메인 별로 CRUD 를 구현합니다. 이때 다양한 조건을 제공할 수 있도록 필요한 경우에 한해 INDEX 를 생성합니다.
 
-### 생각해야 할 부분
+---
+
+## 더 생각해야 할 부분
+
+### RDB 처리 시 부하 분산
 대용량 데이터 환경에서는 DB 서버와 APP 서버의 스펙을 고려하여 API 1, 2, 3 을 구현해야합니다. 일반적인 환경의 경우 상대적으로 WAS 의 부하가 적어 
 합계 연산은 WAS에서 수행하거나, 이름 테이블은 JOIN 하지 않는 대신 별도의 쿼리를 날려 가져오는 방향으로 구현할 수 있지만, 상대적으로 DB 서버의 부하 한게가
 큰 엔터프라이즈 환경에서는 모든 JOIN 과 SUM, AVG 연산을 쿼리로 수행하는것도 검토할 수 수 있습니다.
+
+### ES 로의 전환
+실서비스 환경에서는 트랜잭션이 활발히 이루어지므로, 사실상 FULLSCAN 이 이루어지는 DB에서 통계 정보를 수집하는것은 효율적인 선택은 아닙니다. 전시 상품의
+정보변경이 고객 활동 트랜잭션보다는 훨씬 적으므로, 동적 색인 지연 시간동안의 일시적인 최신 정보의 불일치는 고객의 경험에 큰 악영향을 주지는 않을것이란 판단을 
+하였습니다. 이에 ES를 이용해 API 1 ~ API 3 의 통계 정보를 작성하는 방법을 검토해보았습니다.
+
+#### API 1
+```
+{
+    "aggs": {
+        "category": {
+            "terms": {
+                "field": "categoryId"
+            }, 
+            "aggs": {
+                "price": {
+                    "top_hits": {
+                        "sort": [
+                            {"price": "asc", "brandId": "desc"}
+                        ],
+                        "_source": {
+                            "includes": ["categoryId", "categoryName", "brandId", "brandName", "price"]
+                        },
+                        "size":1
+                    }
+                }
+            }
+        }
+    }
+}
+```
+RDB SQL 의 SELECT DISTINCT ON 과 동일한 동작을 수행합니다.
+
+#### 
+```
+{
+    "aggs": {
+        "brand": {
+            "terms": {
+                "field": "brandId"
+            }, 
+            "aggs": {
+                "categories": {
+                    "cardinality": {
+                        "field": "categoryId"
+                    }
+                },
+                "categories_filter": {
+                    "bucket_selector": {
+                        "buckets_path": {
+                            "categories": "categories"
+                        },
+                        "script": "params.categories == 8"
+                    }
+                },
+                "category": {
+                    "terms": {
+                        "field": "categoryId"
+                    }, 
+                    "aggs": {
+                        "priceMin": {
+                            "min": {
+                                "field": "price"
+                            }
+                        }
+                    }
+                },
+                "totalAmount": {
+                    "sum_bucket": {
+                        "buckets_path": "category>priceMin"
+                    }
+                }
+            }
+        },
+        "brand_filter": {
+            "min_bucket": {
+                "buckets_path": "brand>totalAmount"
+            }
+        }
+    }
+}
+```
+기존의 전제 조건인 
+
+1. 하나의 브랜드가 하나의 카테고리에 두개 이상의 상품을 전시할 수 있다 
+2. 담당자의 실수로 일부 카테고리에 브랜드의 전시를 누락할 수도 있다.
+
+의 경우에 대응하기 위해 min aggregation 과 bucket_selector를 사용하였습니다. 로직은 다음과 같습니다.
+1. 브랜드 기준으로 aggregation을 수행합니다.
+2. 버킷에 담긴 브랜드의 카테고리 가짓수(cardinality)를 구하여 카테고리 개수(=8)를 만족하는 버킷만 필터합니다.
+3. 카테고리별로 상품의 최저가를 구합니다. 이 시점에 브랜드+카테고리 별 최저 상품 가격이 정리됩니다.
+4. 버킷의 모든 상품의 가격의 합(totalAmount)을 구합니다.
+5. totalAmount 기준 최저가의 브랜드 정보를 구합니다.
+
+#### API 3
+```
+{
+    "query": {
+        "bool": {
+            "must": [
+                {"match" : {"categoryName" : ":카테고리 이름"}}
+            ]
+        }
+    },
+    "sort" : [
+        {"price": {"order":"desc"}}
+    ],
+    "size": 1
+}
+```
+카테고리 이름 기준으로 전시 상품을 조회하고 최고가, 최저가를 구하는 SQL 과 동일합니다.
+
+#### 구현
+Springboot에서 제공하는 `Elasticsearch Repositories` 로 인덱스 생성과 색인을 구현하고, Elasticsearch에서 제공하는
+`Elasticsearch Java API Client` 를 이용해 native query를 실행하는 방법으로 구현합니다.
+
+---
 
 ## 검증 방법
 1. 각각의 기능 단위로 유닛 테스트를 구현하였습니다. 유닛 테스트는 Positive / Negative 케이스를 모두 고려합니다.
 2. 통합테스트는 서비스 레벨의 유닛테스트와, intelliJ 의 http 에 정의한 시나리오로 수행합니다.
 3. swagger를 이용하여 end-to-end 테스트를 수행합니다.
-
-## 결론
 
 
 
