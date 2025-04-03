@@ -1,6 +1,7 @@
 package com.musinsa.muordi.platform.admin.dto;
 
 import com.musinsa.muordi.platform.admin.repository.Product;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.*;
 
 /**
@@ -20,6 +21,7 @@ import lombok.*;
  *     </li>
  * </ul>
  */
+@Hidden
 @Getter
 @Setter
 @ToString

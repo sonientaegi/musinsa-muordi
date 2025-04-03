@@ -1,5 +1,6 @@
 package com.musinsa.muordi.platform.admin.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -21,7 +22,10 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductRequest {
+    @Schema(description = "브랜드 ID", example = "47")
     @NotBlank
     private int brandId;
+
+    @Schema(description = "상품가격", example = "43900")
     private int price;
 }

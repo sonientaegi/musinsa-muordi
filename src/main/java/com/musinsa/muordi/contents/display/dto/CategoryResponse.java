@@ -1,5 +1,6 @@
 package com.musinsa.muordi.contents.display.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,8 +23,13 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 public class CategoryResponse {
+    @Schema(description = "전시 카테고리 ID", example = "1")
     private Integer id;
+
+    @Schema(description = "전시 카테고리 이름", example = "상의")
     private String name;
+
+    @Schema(description = "전시 순서", example = "1")
     private int displaySequence;
 
 }

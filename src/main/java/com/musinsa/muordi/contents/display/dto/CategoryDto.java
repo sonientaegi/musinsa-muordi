@@ -1,5 +1,6 @@
 package com.musinsa.muordi.contents.display.dto;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.*;
 
 /**
@@ -17,6 +18,7 @@ import lombok.*;
  * </ul>
  * 카테고리는 읽기 전용이다.
  */
+@Hidden
 @Getter
 @Setter
 @ToString

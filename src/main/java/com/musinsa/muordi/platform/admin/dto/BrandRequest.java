@@ -1,5 +1,6 @@
 package com.musinsa.muordi.platform.admin.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 /**
@@ -17,5 +18,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BrandRequest {
+    @Schema(description = "브랜드 이름", example = "소년 스튜디오")
     private String name;
 }
