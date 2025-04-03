@@ -64,8 +64,8 @@ public class AdminController {
     @ApiResponse(responseCode = "200", description = "OK")
     @ApiResponse(responseCode = "404", description = "수정 대상이 없다.", content = @Content())
     @PutMapping("/brand/{id}")
-    public BrandResponse updateBrand(@PathVariable int id, @RequestBody BrandDto brandDto) {
-        return this.brandMapper.toResponse(this.adminService.updateBrand(id, brandDto));
+    public BrandResponse updateBrand(@PathVariable int id, @RequestBody BrandRequest request) {
+        return this.brandMapper.toResponse(this.adminService.updateBrand(id, this.brandMapper.fromRequest(request)));
     }
 
     @Operation(summary = "브랜드 삭제")
