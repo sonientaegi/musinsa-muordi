@@ -1,8 +1,6 @@
 package com.musinsa.muordi.common.exception;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.musinsa.muordi.common.util.ExceptionController;
-import org.springframework.http.HttpStatus;
 
 /**
  * 조회 하고자 하는 자원이 없다.

@@ -187,7 +187,7 @@ insert into showcase(category_id, product_id) values
 
 -- 문제 2
 -- select BRAND_ID, sum(PRICE), count(*) from (
---     select category_id as CATEGORY_ID, PRODUCT.brand_id as BRAND_ID, PRODUCT.price as PRICE
+--     select DISTINCT ON(CATEGORY_ID, PRODUCT_ID) category_id as CATEGORY_ID, PRODUCT.brand_id as BRAND_ID, PRODUCT.price as PRICE
 --     from SHOWCASE
 --     inner join PRODUCT on SHOWCASE.product_id = PRODUCT.id
 --     inner join CATEGORY on SHOWCASE.category_id = CATEGORY.id

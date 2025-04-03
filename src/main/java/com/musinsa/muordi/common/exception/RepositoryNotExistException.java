@@ -1,11 +1,7 @@
 package com.musinsa.muordi.common.exception;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.musinsa.muordi.common.util.ExceptionController;
 import lombok.Getter;
-
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 /**
  * CUD 하려는 데이터가 존재하지 않는다.
