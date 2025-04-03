@@ -141,10 +141,10 @@ INDEX
 
 #### PRODUCT ( 상품 )
 | 컬럼       | PK | FK | UK | 타입       | 역할     |
-|----------|----|----|----|----------|--------|
-| ID       | O  |    |    | INT(증분)  | 상품 ID  |
-| BRAND_ID |    | O  |    | BRAND.ID | 브랜드 ID |
-| PRICE    |    |    |    | INT      | 상품 판매가 |
+|----------|----|----|----|-----------|--------|
+| ID       | O  |    |    | LONG(증분)  | 상품 ID  |
+| BRAND_ID |    | O  |    | BRAND.ID  | 브랜드 ID |
+| PRICE    |    |    |    | INT       | 상품 판매가 |
 
 INDEX
 - BRAND_ID
