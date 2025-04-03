@@ -1,5 +1,6 @@
 package com.musinsa.muordi.contents.display.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -18,6 +19,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ShowcaseUpdateRequest {
+    @Schema(description = "카테고리 ID", example = "2")
     @NotBlank
     private int categoryId;
 }

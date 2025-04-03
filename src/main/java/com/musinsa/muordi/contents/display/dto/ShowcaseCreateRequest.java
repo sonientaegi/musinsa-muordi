@@ -1,5 +1,6 @@
 package com.musinsa.muordi.contents.display.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -21,8 +22,11 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ShowcaseCreateRequest {
+    @Schema(description = "전시 상품 ID", example = "47")
     @NotBlank
     private long productId;
+
+    @Schema(description = "전시 카테고리 ID", example = "1")
     @NotBlank
     private int categoryId;
 }

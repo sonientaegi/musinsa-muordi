@@ -7,6 +7,9 @@ GET http://{{host}}/api/display/v1/showcase
 ### 쇼케이스 상품 조회
 GET http://{{host}}/api/display/v1/showcase/4
 
+### 쇼케이스 상품 조회 - 없는 상품
+GET http://{{host}}/api/display/v1/showcase/99999
+
 ### 쇼케이스 브랜드 조회
 GET http://{{host}}/api/display/v1/showcase/brand/4
 
@@ -26,6 +29,15 @@ Content-Type: application/json
 {
   "categoryId":1
 }
+
+### 쇼케이스 수정 - 없는 ID
+PUT http://{{host}}/api/display/v1/showcase/99999
+Content-Type: application/json
+
+{
+  "categoryId":1
+}
+
 
 ### 쇼케이스 삭제
 DELETE http://{{host}}/api/display/v1/showcase/4

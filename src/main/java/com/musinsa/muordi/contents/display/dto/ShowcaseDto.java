@@ -1,6 +1,7 @@
 package com.musinsa.muordi.contents.display.dto;
 
 import com.musinsa.muordi.contents.display.repository.Showcase;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.*;
 
 import java.util.List;
@@ -28,6 +29,7 @@ import java.util.List;
  *     </li>
  * </ul>
  */
+@Hidden
 @Getter
 @Setter
 @ToString

@@ -4,6 +4,12 @@ GET http://{{host}}/api/admin/v1/brand
 ### 특정 브랜드 조회
 GET http://{{host}}/api/admin/v1/brand/2
 
+### 특정 브랜드 조회 - 없는 ID
+GET http://{{host}}/api/admin/v1/brand/9999999
+
+### 브랜드 이름 조회
+GET http://{{host}}/api/admin/v1/brand/name/A
+
 ### 브랜드 생성
 POST http://{{host}}/api/admin/v1/brand
 Content-Type: application/json
@@ -14,6 +20,14 @@ Content-Type: application/json
 
 ### 브랜드 수정
 PUT http://{{host}}/api/admin/v1/brand/2
+Content-Type: application/json
+
+{
+  "name": "소니언스튜디오"
+}
+
+### 브랜드 수정 - 없는 ID
+PUT http://{{host}}/api/admin/v1/brand/9999999
 Content-Type: application/json
 
 {
