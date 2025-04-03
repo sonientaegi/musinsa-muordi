@@ -290,7 +290,7 @@ SHOWCASE-CATEGORY 테이블을 조인하여 카테고리 이름 조건으로 최
 ```
 RDB SQL 의 SELECT DISTINCT ON 과 동일한 동작을 수행합니다.
 
-#### 
+#### API 2
 ```
 {
     "aggs": {
